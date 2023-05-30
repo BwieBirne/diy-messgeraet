@@ -1,7 +1,7 @@
 
 //enums
-enum freq_type {AC, DC, DAC};
-enum m_type {U, I};
+enum frequency_type {AC, DC, DAC};
+enum measurement_type {U, I};
 
 //pins
 #define U_PIN A0
@@ -12,8 +12,8 @@ enum m_type {U, I};
 #define MEASUREMENT_DELAY 20
 
 //varibales
-enum freq_type = DC;
-enum m_type = U;
+enum frequency_type f_type  = DC;
+enum measurement_type m_type = U;
 float current_U = 0.0f;
 float current_I = 0.0f;
 

@@ -2,8 +2,8 @@
 void setup() {
 
   Serial.begin(9600);
-  pinMode(U_PIN, INPUT);
-  pinMode(I_PIN, INPUT);
+  pinMode(A0, INPUT);
+  pinMode(A3, INPUT);
 
 }
 
@@ -16,6 +16,7 @@ void loop() {
 
 void timer(){
 
+  measurement(A0);
 
 }
 
