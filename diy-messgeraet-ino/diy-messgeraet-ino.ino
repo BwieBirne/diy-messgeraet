@@ -1,3 +1,5 @@
+//includes
+#include "ssd1306.h"
 
 //enums
 enum frequency_type { AC,
@@ -22,7 +24,7 @@ enum measurement_type { U,
 
 //varibales
 enum frequency_type f_type = DC;
-enum measurement_type m_type = U;
+enum measurement_type m_type = I;
 float current_U = 0.0f;
 float current_I = 0.0f;
 
@@ -30,13 +32,20 @@ float current_I = 0.0f;
 #define MEASUREMENT_INTERVAL 1000
 long int m_timer = 0;
 
+bool displayUpdate = true;
+
 void setup() {
 
   Serial.begin(9600);
+
   pinMode(U_PIN, INPUT);
   pinMode(I_PIN, INPUT);
 
-  Serial.println("A");
+  ssd1306_128x64_i2c_init();
+
+  ssd1306_clearScreen();
+
+  Serial.println("Bereit");
 }
 
 void loop() {
@@ -46,5 +55,19 @@ void loop() {
 
 void timer() {
 
-  measurement(U_PIN);
+  long int now = millis();
+
+  if (now - m_timer > MEASUREMENT_INTERVAL) {
+    displayUpdate = true;
+    m_timer = now;
+    switch (m_type) {
+    case U:
+      current_U = measurement(U_PIN);
+    case I:
+      current_I = measurement(I_PIN);
+  }
+  Serial.println(current_I);
+  }
+
+  if (displayUpdate) updateDisplay();
 }

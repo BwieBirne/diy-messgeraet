@@ -1,7 +1,6 @@
 
 float measurement(const int mPin) {
 
-
   //max gibt Spitzenwert
   //min gibt DC Offset
   //avg ist NICHT der Effektivwert!!
@@ -28,18 +27,20 @@ float measurement(const int mPin) {
     }
     min -= I_OFFSET;
     max -= I_OFFSET;
-    avg = avg - (MEASUREMENT_ITR * I_OFFSET);
+    Serial.println(100 * 508); //tf????
+    //avg = avg - (MEASUREMENT_ITR * I_OFFSET);
+    avg = avg - (50800);
   }
 
   avg = avg / MEASUREMENT_ITR;
 
   if (max - min > avg) {
-    //AC kann nur über I festgestellt werden!
+    //AC kann nur über I-Sensor festgestellt werden!
     f_type = DAC;
   } else {
     f_type = DC;
   }
-
+  /*
   switch (f_type) {
     case DC:
       avg = (min + ((max - min) / (SQRT2)));
@@ -47,12 +48,12 @@ float measurement(const int mPin) {
       avg = (min + ((max - min) / (SQRT2)));
     case AC:
       avg = (min + ((max - min) / (SQRT2)));
-  }
+  }*/
 
   switch (m_type) {
     case U:
       return (avg / U_DIVIDER);
     case I:
-      return ((I_OFFSET - avg) / I_DIVIDER);
+      return (avg / I_DIVIDER);
   }
 }
