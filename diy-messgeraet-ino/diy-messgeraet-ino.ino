@@ -30,7 +30,7 @@ float current_I = 0.0f;
 
 //timer
 #define MEASUREMENT_INTERVAL 1000
-long int m_timer = 0;
+unsigned long m_timer = 0;
 
 bool displayUpdate = true;
 
@@ -55,7 +55,7 @@ void loop() {
 
 void timer() {
 
-  long int now = millis();
+  unsigned long now = millis();
 
   if (now - m_timer > MEASUREMENT_INTERVAL) {
     displayUpdate = true;

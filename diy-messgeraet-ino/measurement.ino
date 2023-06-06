@@ -27,9 +27,7 @@ float measurement(const int mPin) {
     }
     min -= I_OFFSET;
     max -= I_OFFSET;
-    Serial.println(100 * 508); //tf????
-    //avg = avg - (MEASUREMENT_ITR * I_OFFSET);
-    avg = avg - (50800);
+    avg = avg - (long)(MEASUREMENT_ITR * I_OFFSET);
   }
 
   avg = avg / MEASUREMENT_ITR;
@@ -37,9 +35,13 @@ float measurement(const int mPin) {
   if (max - min > avg) {
     //AC kann nur über I-Sensor festgestellt werden!
     f_type = DAC;
+  } else if (min < 0) {
+    f_type = AC;
   } else {
     f_type = DC;
   }
+
+  Serial.println(f_type);
   /*
   switch (f_type) {
     case DC:
@@ -47,7 +49,7 @@ float measurement(const int mPin) {
     case DAC:
       avg = (min + ((max - min) / (SQRT2)));
     case AC:
-      avg = (min + ((max - min) / (SQRT2)));
+      avg = (min + (min - min) / (SQRT2)));
   }*/
 
   switch (m_type) {
