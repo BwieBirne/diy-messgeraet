@@ -11,6 +11,10 @@ enum measurement_type { U,
 //pins
 #define U_PIN A0
 #define I_PIN A3
+#define SWITCH_PIN 2
+
+//
+bool switchLock = false;
 
 //constants
 #define MEASUREMENT_ITR 100
@@ -28,6 +32,8 @@ enum measurement_type m_type = I;
 float current_U = 0.0f;
 float current_I = 0.0f;
 
+//EEPROM
+
 //timer
 #define MEASUREMENT_INTERVAL 1000
 unsigned long m_timer = 0;
@@ -40,6 +46,7 @@ void setup() {
 
   pinMode(U_PIN, INPUT);
   pinMode(I_PIN, INPUT);
+  pinMode(SWITCH_PIN, INPUT_PULLUP);
 
   ssd1306_128x64_i2c_init();
 
@@ -57,6 +64,20 @@ void timer() {
 
   unsigned long now = millis();
 
+  if(!digitalRead(SWITCH_PIN) && !switchLock) {
+    switchLock = true;
+    switch (m_type) {
+    case U:
+      m_type = I;
+      current_U = 0;
+    case I:
+      m_type = U;
+      current_I = 0;
+    }
+  } else if (digitalRead(SWITCH_PIN)) {
+    switchLock = false;
+  }
+
   if (now - m_timer > MEASUREMENT_INTERVAL) {
     displayUpdate = true;
     m_timer = now;
@@ -65,9 +86,14 @@ void timer() {
       current_U = measurement(U_PIN);
     case I:
       current_I = measurement(I_PIN);
-  }
-  Serial.println(current_I);
+    }
   }
 
   if (displayUpdate) updateDisplay();
+}
+
+void getData() {
+
+
+
 }
