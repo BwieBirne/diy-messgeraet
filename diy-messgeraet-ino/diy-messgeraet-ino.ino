@@ -1,5 +1,11 @@
+// WICHTIG:
+// KEINE CASE-STATEMENTS VERWENDEN!!1!111!
+
+
 //includes
 #include "ssd1306.h"
+#include <EEPROM.h>
+//#include <WiFiNINA.h>
 
 //enums
 enum frequency_type { AC,
@@ -13,7 +19,7 @@ enum measurement_type { U,
 #define I_PIN A3
 #define SWITCH_PIN 2
 
-//
+//locks
 bool switchLock = false;
 
 //constants
@@ -66,11 +72,10 @@ void timer() {
 
   if(!digitalRead(SWITCH_PIN) && !switchLock) {
     switchLock = true;
-    switch (m_type) {
-    case U:
+    if (m_type == U) {
       m_type = I;
       current_U = 0;
-    case I:
+    } else {
       m_type = U;
       current_I = 0;
     }
@@ -81,10 +86,9 @@ void timer() {
   if (now - m_timer > MEASUREMENT_INTERVAL) {
     displayUpdate = true;
     m_timer = now;
-    switch (m_type) {
-    case U:
+    if (m_type == U) {
       current_U = measurement(U_PIN);
-    case I:
+    } else {
       current_I = measurement(I_PIN);
     }
   }

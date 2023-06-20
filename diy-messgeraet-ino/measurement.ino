@@ -2,7 +2,7 @@
 float measurement(const int mPin) {
 
   //max gibt Spitzenwert
-  //min gibt DC Offset
+  //min gibt DC Offset bei U und DC/DAC
   //avg ist NICHT der Effektivwert!!
   int mArray[MEASUREMENT_ITR];
   long int avg = 0;
@@ -42,19 +42,17 @@ float measurement(const int mPin) {
   }
 
   /*
-  switch (f_type) {
-    case DC:
+  if (f_type == DC) {
       avg = (min + ((max - min) / (SQRT2)));
-    case DAC:
+  } else if (f_type == DAC) {
       avg = (min + ((max - min) / (SQRT2)));
-    case AC:
+  } else {
       avg = (min + ((min - min) / (SQRT2)));
   }*/
 
-  switch (m_type) {
-    case U:
+  if (m_type == U) {
       return (avg / U_DIVIDER);
-    case I:
+  } else {
       return (avg / I_DIVIDER);
   }
 }
