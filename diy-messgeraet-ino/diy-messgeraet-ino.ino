@@ -1,9 +1,9 @@
 // WICHTIG:
-// KEINE SWITCH-CASE-STATEMENTS VERWENDEN!!1!111!
+// KEINE SWITCH-CASE-STATEMENTS VERWENDEN!
 
 
 //includes
-#include "ssd1306.h"
+#include "ssd1306.h" //Alexey Dynda
 #include <EEPROM.h>
 //#include <WiFiNINA.h>
 
@@ -26,7 +26,7 @@ bool switchLock = false;
 #define MEASUREMENT_ITR 100
 #define MEASUREMENT_DELAY 20
 
-#define U_DIVIDER 40.6f
+#define U_DIVIDER 40.3f
 #define I_DIVIDER 40.0f
 #define I_OFFSET 508
 
@@ -39,12 +39,12 @@ float current_U = 0.0f;
 float current_I = 0.0f;
 
 //EEPROM
+#define EEPROM_CHECK_ADDR 0
+#define EEPROM_CHECK_VAL 1
 
 //timer
 #define MEASUREMENT_INTERVAL 1000
 unsigned long m_timer = 0;
-
-bool displayUpdate = true;
 
 void setup() {
 
@@ -55,15 +55,20 @@ void setup() {
   pinMode(SWITCH_PIN, INPUT_PULLUP);
 
   ssd1306_128x64_i2c_init();
-
   ssd1306_clearScreen();
 
+  getData();
+
   Serial.println("Bereit");
+  Serial.println("t\tm\tf\tU in V\tI in A");
+  Serial.println("---------------------------------------");
+
 }
 
 void loop() {
 
   timer();
+
 }
 
 void timer() {
@@ -84,20 +89,24 @@ void timer() {
   }
 
   if (now - m_timer > MEASUREMENT_INTERVAL) {
-    displayUpdate = true;
     m_timer = now;
     if (m_type == U) {
       current_U = measurement(U_PIN);
     } else {
       current_I = measurement(I_PIN);
     }
+    updateDisplay();
+    serialInfoTab();
   }
 
-  if (displayUpdate) updateDisplay();
 }
 
 void getData() {
 
+  if (EEPROM.read(EEPROM_CHECK_ADDR) != EEPROM_CHECK_VAL) {
+    EEPROM.put(EEPROM_CHECK_ADDR, EEPROM_CHECK_VAL);
+  } else {
 
+  }
 
 }

@@ -3,7 +3,6 @@
 
 void updateDisplay() {
 
-  displayUpdate = false;
   //ohne clear sieht schöner aus, aber vielleicht brauchen wir es, wenn es Anzeigebugs gibt
   //ssd1306_clearScreen();
 
@@ -34,3 +33,51 @@ void updateDisplay() {
   }
 
 }
+
+void serialInfoBlock() {
+
+  Serial.println("---------------------------------------");
+  Serial.print("t: ");
+  Serial.println(millis());
+  if (m_type == U) {
+    Serial.println("m: U");
+  } else {
+    Serial.println("m: I");
+  }
+  if (f_type == AC) {
+    Serial.println("f: AC");
+  } else if (f_type == DAC) {
+    Serial.println("f: DAC");
+  } else {
+    Serial.println("f: DC");
+  }
+  Serial.print("U in V: ");
+  Serial.println(current_U);
+  Serial.print("I in A: ");
+  Serial.println(current_I);
+  Serial.println("---------------------------------------");
+  
+}
+
+void serialInfoTab() {
+
+  Serial.print(millis());
+  Serial.print("\t");
+  if (m_type == U) {
+    Serial.print("U\t");
+  } else {
+    Serial.print("I\t");
+  }
+  if (f_type == AC) {
+    Serial.print("AC\t");
+  } else if (f_type == DAC) {
+    Serial.print("DAC\t");
+  } else {
+    Serial.print("DC\t");
+  }
+  Serial.print(current_U);
+  Serial.print("\t");
+  Serial.println(current_I);
+
+}
+

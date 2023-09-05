@@ -32,7 +32,7 @@ float measurement(const int mPin) {
 
   avg = avg / MEASUREMENT_ITR;
 
-  if (max - min > avg) {
+  if (max - min > avg && m_type == I) {
     //AC kann nur über I-Sensor festgestellt werden!
     f_type = DAC;
   } else if (min < 0) {
