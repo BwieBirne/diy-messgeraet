@@ -13,25 +13,24 @@ void updateDisplay() {
   dtostrf(current_I, 6, 2, I_char);
 
   ssd1306_setFixedFont(ssd1306xled_font8x16);
-  ssd1306_printFixed(0,  8, "U in V: ", STYLE_NORMAL);
+  ssd1306_printFixed(0, 8, "U in V: ", STYLE_NORMAL);
   ssd1306_printFixed(0, 24, "I in A: ", STYLE_NORMAL);
-  ssd1306_printFixed(60,  8, U_char, STYLE_BOLD);
+  ssd1306_printFixed(60, 8, U_char, STYLE_BOLD);
   ssd1306_printFixed(60, 24, I_char, STYLE_BOLD);
 
   if (m_type == U) {
-    ssd1306_printFixed(0,  40, "m: U", STYLE_NORMAL);
+    ssd1306_printFixed(0, 40, "m: U", STYLE_NORMAL);
   } else {
-    ssd1306_printFixed(0,  40, "m: I", STYLE_NORMAL);
+    ssd1306_printFixed(0, 40, "m: I", STYLE_NORMAL);
   }
 
   if (f_type == AC) {
-      ssd1306_printFixed(40,  40, "f: AC", STYLE_NORMAL);
+    ssd1306_printFixed(40, 40, "f: AC", STYLE_NORMAL);
   } else if (f_type == DAC) {
-      ssd1306_printFixed(40,  40, "f: DAC", STYLE_NORMAL);
+    ssd1306_printFixed(40, 40, "f: DAC", STYLE_NORMAL);
   } else {
-      ssd1306_printFixed(40,  40, "f: DC", STYLE_NORMAL);
+    ssd1306_printFixed(40, 40, "f: DC", STYLE_NORMAL);
   }
-
 }
 
 void serialInfoBlock() {
@@ -44,19 +43,21 @@ void serialInfoBlock() {
   } else {
     Serial.println("m: I");
   }
+  Serial.print("f in Hz: ");
+  Serial.print(freq);
+  Serial.print(" (");
   if (f_type == AC) {
-    Serial.println("f: AC");
+    Serial.println("AC)");
   } else if (f_type == DAC) {
-    Serial.println("f: DAC");
+    Serial.println("DAC)");
   } else {
-    Serial.println("f: DC");
+    Serial.println("DC)");
   }
   Serial.print("U in V: ");
   Serial.println(current_U);
   Serial.print("I in A: ");
   Serial.println(current_I);
   Serial.println("---------------------------------------");
-  
 }
 
 void serialInfoTab() {
@@ -68,16 +69,16 @@ void serialInfoTab() {
   } else {
     Serial.print("I\t");
   }
+  Serial.print(freq);
+  Serial.print(" (");
   if (f_type == AC) {
-    Serial.print("AC\t");
+    Serial.print("AC)\t");
   } else if (f_type == DAC) {
-    Serial.print("DAC\t");
+    Serial.print("DAC)\t");
   } else {
-    Serial.print("DC\t");
+    Serial.print("DC)\t");
   }
   Serial.print(current_U);
   Serial.print("\t");
   Serial.println(current_I);
-
 }
-
