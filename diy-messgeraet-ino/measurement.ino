@@ -4,13 +4,12 @@ float getVoltage(const int mPin) {
   //max gibt Spitzenwert
   //min gibt DC Offset bei DC/DAC
   //avg ist NICHT der Effektivwert!
-  int16_t mArray[MEASUREMENT_ITR];
+  uint16_t mArray[MEASUREMENT_ITR];
   uint32_t avg = 0;
-  int16_t min = 1023;
-  int16_t max = -1023;
+  uint16_t min = 1023;
+  uint16_t max = 0;
 
   for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
-
     mArray[i] = analogRead(mPin);
     delayMicroseconds(MEASUREMENT_DELAY);
   }
@@ -20,6 +19,8 @@ float getVoltage(const int mPin) {
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
+
+  if (f_type == AC || f_type == DAC) return ((min + ((max - min) / (SQRT2))) / (U_DIVIDER));
 
   avg = avg / MEASUREMENT_ITR;
 
@@ -32,13 +33,12 @@ float getCurrent(const int mPin) {
   //max gibt Spitzenwert
   //min gibt DC Offset bei DC/DAC
   //avg ist NICHT der Effektivwert!
-  int16_t mArray[MEASUREMENT_ITR];
+  uint16_t mArray[MEASUREMENT_ITR];
   int32_t avg = 0;
   int16_t min = 1023;
-  int16_t max = -1023;
+  int16_t max = 0;
 
   for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
-
     mArray[i] = analogRead(mPin);
     delayMicroseconds(MEASUREMENT_DELAY);
   }
@@ -54,57 +54,64 @@ float getCurrent(const int mPin) {
   }
   min -= I_OFFSET;
   max -= I_OFFSET;
-  avg = avg - ((long)MEASUREMENT_ITR * I_OFFSET);
 
+  if (f_type == AC || f_type == DAC) {
+    if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (I_DIVIDER));
+    else return ((max + ((min - max) / (SQRT2))) / (I_DIVIDER));
+  }
+
+  avg = avg - ((long)MEASUREMENT_ITR * I_OFFSET);
   avg = avg / MEASUREMENT_ITR;
 
   return (avg / I_DIVIDER);
 }
 
-void getftype(const int mPin) {
+void getFreq(const int mPin) {
 
-  uint16_t maximum = 0;
-  uint16_t minimum = 0;
-  maximum = minimum = analogRead(mPin);
+  uint16_t max = 0;
+  uint16_t min = 0;
+  max = min = analogRead(mPin);
+  uint32_t timeOut = 1000000 / MIN_FREQ;
 
-  //  determine maxima
-  uint32_t timeOut = round(1000000.0 / minimalFrequency);
   uint32_t start = micros();
   while (micros() - start < timeOut) {
-    int value = _analogRead(_pin);
-    if (value > maximum) maximum = value;
-    if (value < minimum) minimum = value;
+    uint16_t value = analogRead(mPin);
+    if (value < min) min = value;
+    if (value > max) max = value;
   }
 
-  //  calculate quarter points
-  //  using quarter points is less noise prone than using one single midpoint
-  int Q1 = (3 * minimum + maximum) / 4;
-  int Q3 = (minimum + 3 * maximum) / 4;
+  if (max - min < 20) {
+    f_type = DC;
+    freq = 0.0;
+    return;
+  } else if (max > 508 && min > 508 || max < 516 && min < 516) {
+    f_type = DAC;
+  } else {
+    f_type = AC;
+  }
 
-  //  10x passing Quantile points
-  //  wait for the right moment to start
-  //  to prevent endless loop a timeout is checked.
-  timeOut *= 10;
+  uint16_t Q1 = (3 * min + max) / 4;
+  uint16_t Q3 = (min + 3 * max) / 4;
+
+  timeOut *= FREQ_ITR;
   start = micros();
-  //  casting to int to keep compiler happy.
-  while ((int(_analogRead(_pin)) > Q1) && ((micros() - start) < timeOut))
+
+  while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
     ;
-  while ((int(_analogRead(_pin)) <= Q3) && ((micros() - start) < timeOut))
+  while ((analogRead(mPin) <= Q3) && ((micros() - start) < timeOut))
     ;
+
   start = micros();
-  for (int i = 0; i < 10; i++) {
-    while ((int(_analogRead(_pin)) > Q1) && ((micros() - start) < timeOut))
+  for (uint8_t i = 0; i < FREQ_ITR; i++) {
+    while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
       ;
-    while ((int(_analogRead(_pin)) <= Q3) && ((micros() - start) < timeOut))
+    while ((analogRead(mPin) <= Q3) && ((micros() - start) < timeOut))
       ;
   }
   uint32_t stop = micros();
 
-  //  calculate frequency
   float wavelength = stop - start;
-  float frequency = 1e7 / wavelength;
-  if (_microsAdjust != 1.0) frequency *= _microsAdjust;
-  return frequency;
+  freq = FREQ_ITR * 1000000 / wavelength;
 }
 
 uint16_t ACSCal(const int mPin) {
@@ -114,7 +121,6 @@ uint16_t ACSCal(const int mPin) {
   uint32_t sum = 0;
 
   for (int8_t i = 0; i < MEASUREMENT_ITR; i++) {
-
     sum += analogRead(mPin);
     delayMicroseconds(1);
   }
