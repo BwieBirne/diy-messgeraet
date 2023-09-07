@@ -73,7 +73,7 @@ void getFreq(const int mPin) {
   uint16_t max = 0;
   uint16_t min = 0;
   max = min = analogRead(mPin);
-  uint32_t timeOut = 1000000 / MIN_FREQ;
+  uint32_t timeOut = 1e6 / MIN_FREQ;
 
   uint32_t start = micros();
   while (micros() - start < timeOut) {
@@ -113,7 +113,7 @@ void getFreq(const int mPin) {
   uint32_t stop = micros();
 
   float wavelength = stop - start;
-  freq = FREQ_ITR * 1000000 / wavelength;
+  freq = FREQ_ITR * 1e6 / wavelength;
 }
 
 uint16_t ACSCal(const int mPin) {

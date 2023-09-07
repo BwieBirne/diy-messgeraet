@@ -23,7 +23,6 @@ enum measurement_type { U,
 //locks
 bool btn1Lock = false;
 bool btn2Lock = false;
-bool doubleLock = false;
 
 //constants
 #define MEASUREMENT_ITR 500
@@ -103,25 +102,10 @@ void timer() {
 
 void controls() {
 
-  if (!digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN) && btn2Lock) {
-    doubleLock = true;
-    return;
-  } else if (digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN) && doubleLock) {
-    doubleLock = false;
-    if (f_type == DC) {
-      f_type = DAC;
-    } else if (f_type == DAC) {
-      f_type = AC;
-    } else {
-      f_type = DC;
-    }
-    return;
-  }
-
-  if (!digitalRead(BTN1_PIN) && !btn1Lock && !doubleLock) {
+  if (!digitalRead(BTN1_PIN) && !btn1Lock) {
     btn1Lock = true;
     return;
-  } else if (digitalRead(BTN1_PIN) && btn1Lock && !doubleLock) {
+  } else if (digitalRead(BTN1_PIN) && btn1Lock) {
     btn1Lock = false;
     if (m_type == U) {
       m_type = I;
@@ -133,12 +117,22 @@ void controls() {
     return;
   }
 
-  if (!digitalRead(BTN2_PIN) && !btn2Lock && !doubleLock) {
+  if (!digitalRead(BTN2_PIN) && !btn2Lock) {
     btn2Lock = true;
     return;
-  } else if (digitalRead(BTN2_PIN) && btn2Lock && !doubleLock) {
+  } else if (digitalRead(BTN2_PIN) && btn2Lock) {
     btn2Lock = false;
-    I_OFFSET = ACSCal(I_PIN);
+    if (m_type == I) {
+      I_OFFSET = ACSCal(I_PIN);
+    } else {
+      if (f_type == DC) {
+        f_type = DAC;
+      } else if (f_type == DAC) {
+        f_type = AC;
+      } else {
+        f_type = DC;
+      }
+    }
     return;
   }
 }
