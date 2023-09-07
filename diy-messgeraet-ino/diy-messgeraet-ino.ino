@@ -26,20 +26,23 @@ bool btn2Lock = false;
 bool doubleLock = false;
 
 //constants
-#define MEASUREMENT_ITR 100
-#define MEASUREMENT_DELAY 20  //für 50Hz
+#define MEASUREMENT_ITR 500
+#define MEASUREMENT_DELAY 1
 #define MIN_FREQ 50
 #define FREQ_ITR 10
 
 #define U_DIVIDER 40.3f
 #define I_DIVIDER 40.0f
 uint16_t I_OFFSET = 512;
+uint8_t U_OFFSET = 16;
+#define FREQ_DC_BOUND 16
+#define FREQ_DAC_BOUND 4
 
 #define SQRT2 1.4142
 
 //varibales
-enum frequency_type f_type = DAC;
-enum measurement_type m_type = I;
+enum frequency_type f_type = DC;
+enum measurement_type m_type = U;
 float current_U = 0.0f;
 float current_I = 0.0f;
 float freq = 0.0;
@@ -65,7 +68,7 @@ void setup() {
   ssd1306_clearScreen();
 
   getData();
-  Serial.println("Kalibrierung...");
+  Serial.println("\nMessgerät");
   delay(1000);
   I_OFFSET = ACSCal(I_PIN);
 
@@ -100,13 +103,11 @@ void timer() {
 
 void controls() {
 
-  if (!digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN) && !doubleLock) {
+  if (!digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN) && btn2Lock) {
     doubleLock = true;
     return;
-  } else if (!(!digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN)) && doubleLock) {
+  } else if (digitalRead(BTN1_PIN) && !digitalRead(BTN2_PIN) && doubleLock) {
     doubleLock = false;
-    btn1Lock = false;
-    btn2Lock = false;
     if (f_type == DC) {
       f_type = DAC;
     } else if (f_type == DAC) {
@@ -117,9 +118,10 @@ void controls() {
     return;
   }
 
-  if (!digitalRead(BTN1_PIN) && !btn1Lock) {
+  if (!digitalRead(BTN1_PIN) && !btn1Lock && !doubleLock) {
     btn1Lock = true;
-  } else if (digitalRead(BTN1_PIN) && btn1Lock) {
+    return;
+  } else if (digitalRead(BTN1_PIN) && btn1Lock && !doubleLock) {
     btn1Lock = false;
     if (m_type == U) {
       m_type = I;
@@ -128,13 +130,16 @@ void controls() {
       m_type = U;
       current_I = 0;
     }
+    return;
   }
 
-  if (!digitalRead(BTN2_PIN) && !btn2Lock) {
+  if (!digitalRead(BTN2_PIN) && !btn2Lock && !doubleLock) {
     btn2Lock = true;
-  } else if (digitalRead(BTN2_PIN) && btn2Lock) {
+    return;
+  } else if (digitalRead(BTN2_PIN) && btn2Lock && !doubleLock) {
     btn2Lock = false;
     I_OFFSET = ACSCal(I_PIN);
+    return;
   }
 }
 

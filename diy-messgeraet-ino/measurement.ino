@@ -6,21 +6,23 @@ float getVoltage(const int mPin) {
   //avg ist NICHT der Effektivwert!
   uint16_t mArray[MEASUREMENT_ITR];
   uint32_t avg = 0;
-  uint16_t min = 1023;
-  uint16_t max = 0;
+  int16_t min = 1023;
+  int16_t max = 0;
 
-  for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     mArray[i] = analogRead(mPin);
     delayMicroseconds(MEASUREMENT_DELAY);
   }
 
-  for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     if (mArray[i] < min) min = mArray[i];
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
+  max -= U_OFFSET;
+  min += U_OFFSET;
 
-  if (f_type == AC || f_type == DAC) return ((min + ((max - min) / (SQRT2))) / (U_DIVIDER));
+  if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (U_DIVIDER));
 
   avg = avg / MEASUREMENT_ITR;
 
@@ -38,24 +40,24 @@ float getCurrent(const int mPin) {
   int16_t min = 1023;
   int16_t max = 0;
 
-  for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     mArray[i] = analogRead(mPin);
     delayMicroseconds(MEASUREMENT_DELAY);
   }
 
-  for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     if (mArray[i] < min) min = mArray[i];
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
 
-  for (uint8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     mArray[i] -= I_OFFSET;
   }
   min -= I_OFFSET;
   max -= I_OFFSET;
 
-  if (f_type == AC || f_type == DAC) {
+  if (f_type != DC) {
     if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (I_DIVIDER));
     else return ((max + ((min - max) / (SQRT2))) / (I_DIVIDER));
   }
@@ -80,11 +82,11 @@ void getFreq(const int mPin) {
     if (value > max) max = value;
   }
 
-  if (max - min < 20) {
+  if (max - min < FREQ_DC_BOUND) {
     f_type = DC;
     freq = 0.0;
     return;
-  } else if (max > 508 && min > 508 || max < 516 && min < 516) {
+  } else if (max > 512 - FREQ_DAC_BOUND && min > 512 - FREQ_DAC_BOUND || max < 512 + FREQ_DAC_BOUND && min < 512 + FREQ_DAC_BOUND) {
     f_type = DAC;
   } else {
     f_type = AC;
@@ -102,7 +104,7 @@ void getFreq(const int mPin) {
     ;
 
   start = micros();
-  for (uint8_t i = 0; i < FREQ_ITR; i++) {
+  for (uint16_t i = 0; i < FREQ_ITR; i++) {
     while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
       ;
     while ((analogRead(mPin) <= Q3) && ((micros() - start) < timeOut))
@@ -117,12 +119,13 @@ void getFreq(const int mPin) {
 uint16_t ACSCal(const int mPin) {
 
   //setzt voraus, dass I zum Zeitpunkt der Kalibrierung null ist
+  Serial.println("Kalibrierung...");
 
   uint32_t sum = 0;
 
-  for (int8_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
     sum += analogRead(mPin);
-    delayMicroseconds(1);
+    delayMicroseconds(MEASUREMENT_DELAY);
   }
 
   return (sum / MEASUREMENT_ITR);
