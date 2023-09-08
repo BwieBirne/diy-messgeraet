@@ -1,6 +1,5 @@
 // NOTIZEN
 // WICHTIG: KEINE SWITCH-CASE-STATEMENTS VERWENDEN!
-// Gleichgerichteter Sinus hat û*1/2 als Effektivwert, nicht û*1/sqrt2
 
 //includes
 #include "ssd1306.h"  //Alexey Dynda
