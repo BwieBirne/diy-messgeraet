@@ -32,8 +32,9 @@ bool btn2Lock = false;
 
 #define U_DIVIDER 40.3f
 #define I_DIVIDER 40.0f
-uint16_t I_OFFSET = 512;
-uint8_t U_OFFSET = 16;
+uint16_t I_MIDPOINT = 512;
+uint8_t I_ERROR = 4;
+uint8_t U_ERROR = 16;
 #define FREQ_DC_BOUND 16
 #define FREQ_DAC_BOUND 4
 
@@ -45,6 +46,8 @@ enum measurement_type m_type = U;
 float current_U = 0.0f;
 float current_I = 0.0f;
 float freq = 0.0;
+
+bool updateVisuals = false;
 
 //EEPROM
 #define EEPROM_CHECK_ADDR 0
@@ -69,7 +72,7 @@ void setup() {
   getData();
   Serial.println("\nMessgerät");
   delay(1000);
-  I_OFFSET = ACSCal(I_PIN);
+  I_MIDPOINT = ACSCal(I_PIN);
 
   Serial.println("Bereit");
   Serial.println("t\tmtype\tftype\tf in Hz\tU in V\tI in A");
@@ -123,7 +126,7 @@ void controls() {
   } else if (digitalRead(BTN2_PIN) && btn2Lock) {
     btn2Lock = false;
     if (m_type == I) {
-      I_OFFSET = ACSCal(I_PIN);
+      I_MIDPOINT = ACSCal(I_PIN);
     } else {
       if (f_type == DC) {
         f_type = DAC;

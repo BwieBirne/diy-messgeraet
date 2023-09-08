@@ -19,8 +19,9 @@ float getVoltage(const int mPin) {
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
-  max -= U_OFFSET;
-  min += U_OFFSET;
+
+  max -= U_ERROR;
+  min += U_ERROR;
 
   if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (U_DIVIDER));
 
@@ -52,17 +53,20 @@ float getCurrent(const int mPin) {
   }
 
   for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
-    mArray[i] -= I_OFFSET;
+    mArray[i] -= I_MIDPOINT;
   }
-  min -= I_OFFSET;
-  max -= I_OFFSET;
+
+  min -= I_MIDPOINT;
+  max -= I_MIDPOINT;
+  max -= I_ERROR;
+  min += I_ERROR;
 
   if (f_type != DC) {
     if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (I_DIVIDER));
     else return ((max + ((min - max) / (SQRT2))) / (I_DIVIDER));
   }
 
-  avg = avg - ((long)MEASUREMENT_ITR * I_OFFSET);
+  avg = avg - ((long)MEASUREMENT_ITR * I_MIDPOINT);
   avg = avg / MEASUREMENT_ITR;
 
   return (avg / I_DIVIDER);
