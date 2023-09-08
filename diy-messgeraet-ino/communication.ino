@@ -1,6 +1,4 @@
-
-//Schnittstelle für Debugging und Datensammlung
-
+//Schnittstelle für Debugging, Datenübertragung und -speicherung
 
 void serialEvent() {
 

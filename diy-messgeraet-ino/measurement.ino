@@ -1,9 +1,6 @@
 
 float getVoltage(const int mPin) {
 
-  //max gibt Spitzenwert
-  //min gibt DC Offset bei DC/DAC
-  //avg ist NICHT der Effektivwert!
   uint16_t mArray[MEASUREMENT_ITR];
   uint32_t avg = 0;
   int16_t min = 1023;
@@ -33,9 +30,6 @@ float getVoltage(const int mPin) {
 
 float getCurrent(const int mPin) {
 
-  //max gibt Spitzenwert
-  //min gibt DC Offset bei DC/DAC
-  //avg ist NICHT der Effektivwert!
   uint16_t mArray[MEASUREMENT_ITR];
   int32_t avg = 0;
   int16_t min = 1023;

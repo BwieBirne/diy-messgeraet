@@ -1,4 +1,3 @@
-
 #define DISPLAY_CHAR_LENGTH 10
 
 void updateDisplay() {

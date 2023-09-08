@@ -1,6 +1,6 @@
-// WICHTIG:
-// KEINE SWITCH-CASE-STATEMENTS VERWENDEN!
-
+// NOTIZEN
+// WICHTIG: KEINE SWITCH-CASE-STATEMENTS VERWENDEN!
+// Gleichgerichteter Sinus hat û*1/2 als Effektivwert, nicht û*1/sqrt2
 
 //includes
 #include "ssd1306.h"  //Alexey Dynda
@@ -26,6 +26,7 @@ bool btn2Lock = false;
 
 //constants
 #define MEASUREMENT_ITR 500
+#define AR_DURATION 0 //microseconds
 #define MEASUREMENT_DELAY 1
 #define MIN_FREQ 50
 #define FREQ_ITR 10
@@ -34,7 +35,7 @@ bool btn2Lock = false;
 #define I_DIVIDER 40.0f
 uint16_t I_MIDPOINT = 512;
 uint8_t I_ERROR = 4;
-uint8_t U_ERROR = 16;
+uint8_t U_ERROR = 12;
 #define FREQ_DC_BOUND 16
 #define FREQ_DAC_BOUND 4
 
@@ -97,6 +98,11 @@ void timer() {
       getFreq(I_PIN);
       current_I = getCurrent(I_PIN);
     }
+    updateVisuals = true;
+  }
+
+  if (updateVisuals) {
+    updateVisuals = false;
     updateDisplay();
     serialInfoTab();
     //serialInfoBlock();
@@ -117,6 +123,7 @@ void controls() {
       m_type = U;
       current_I = 0;
     }
+    updateVisuals = true;
     return;
   }
 
@@ -136,6 +143,7 @@ void controls() {
         f_type = DC;
       }
     }
+    updateVisuals = true;
     return;
   }
 }
