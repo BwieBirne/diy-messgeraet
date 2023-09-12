@@ -71,7 +71,6 @@ void setup() {
 
   getData();
   Serial.println("\nMessgerät");
-  delay(1000);
   I_MIDPOINT = ACSCal(I_PIN);
 
   Serial.println("Bereit");

@@ -118,6 +118,7 @@ uint16_t ACSCal(const int mPin) {
 
   //setzt voraus, dass I zum Zeitpunkt der Kalibrierung null ist
   Serial.println("Kalibrierung...");
+  delay(500);
 
   uint32_t sum = 0;
 
