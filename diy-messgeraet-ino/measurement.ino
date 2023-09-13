@@ -80,11 +80,11 @@ void getFreq(const int mPin) {
     if (value > max) max = value;
   }
 
-  if (max - min < cal1.FREQ_DC_BOUND) {
+  if ((max - min) < cal1.FREQ_DC_BOUND) {
     f_type = DC;
     freq = 0.0;
     return;
-  } else if (max > 512 - cal1.FREQ_DC_BOUND && min > 512 - cal1.FREQ_DC_BOUND || max < 512 + cal1.FREQ_DC_BOUND && min < 512 + cal1.FREQ_DC_BOUND) {
+  } else if ((max > (512 - cal1.FREQ_DC_BOUND) && min > (512 - cal1.FREQ_DC_BOUND)) || (max < (512 + cal1.FREQ_DC_BOUND) && min < (512 + cal1.FREQ_DC_BOUND))) {
     f_type = DAC;
   } else {
     f_type = AC;
