@@ -1,69 +1,69 @@
 
 float getVoltage(const int mPin) {
 
-  uint16_t mArray[MEASUREMENT_ITR];
+  uint16_t mArray[config.MEASUREMENT_ITR];
   uint32_t avg = 0;
   int16_t min = 1023;
   int16_t max = 0;
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     mArray[i] = analogRead(mPin);
-    delayMicroseconds(MEASUREMENT_DELAY);
+    delayMicroseconds(config.MEASUREMENT_DELAY);
   }
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     if (mArray[i] < min) min = mArray[i];
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
 
-  max -= U_ERROR;
-  min += U_ERROR;
+  max -= cal1.U_ERROR;
+  min += cal1.U_ERROR;
 
-  if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (U_DIVIDER));
+  if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
 
-  avg = avg / MEASUREMENT_ITR;
+  avg = avg / config.MEASUREMENT_ITR;
 
-  return (avg / U_DIVIDER);
+  return (avg / cal1.U_DIVIDER);
 }
 
 
 float getCurrent(const int mPin) {
 
-  uint16_t mArray[MEASUREMENT_ITR];
+  uint16_t mArray[config.MEASUREMENT_ITR];
   int32_t avg = 0;
   int16_t min = 1023;
   int16_t max = 0;
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     mArray[i] = analogRead(mPin);
-    delayMicroseconds(MEASUREMENT_DELAY);
+    delayMicroseconds(config.MEASUREMENT_DELAY);
   }
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     if (mArray[i] < min) min = mArray[i];
     if (mArray[i] > max) max = mArray[i];
     avg += mArray[i];
   }
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
-    mArray[i] -= I_MIDPOINT;
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
+    mArray[i] -= 512 + cal1.I_OFFSET;
   }
 
-  min -= I_MIDPOINT;
-  max -= I_MIDPOINT;
-  max -= I_ERROR;
-  min += I_ERROR;
+  min -= 512 + cal1.I_OFFSET;
+  max -= 512 + cal1.I_OFFSET;
+  max -= cal1.I_ERROR;
+  min += cal1.I_ERROR;
 
   if (f_type != DC) {
-    if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (I_DIVIDER));
-    else return ((max + ((min - max) / (SQRT2))) / (I_DIVIDER));
+    if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (cal1.I_DIVIDER));
+    else return ((max + ((min - max) / (SQRT2))) / (cal1.I_DIVIDER));
   }
 
-  avg = avg - ((long)MEASUREMENT_ITR * I_MIDPOINT);
-  avg = avg / MEASUREMENT_ITR;
+  avg = avg - ((long)config.MEASUREMENT_ITR * (512 + cal1.I_OFFSET));
+  avg = avg / config.MEASUREMENT_ITR;
 
-  return (avg / I_DIVIDER);
+  return (avg / cal1.I_DIVIDER);
 }
 
 void getFreq(const int mPin) {
@@ -71,7 +71,7 @@ void getFreq(const int mPin) {
   uint16_t max = 0;
   uint16_t min = 0;
   max = min = analogRead(mPin);
-  uint32_t timeOut = 1e6 / MIN_FREQ;
+  uint32_t timeOut = 1e6 / config.MIN_FREQ;
 
   uint32_t start = micros();
   while (micros() - start < timeOut) {
@@ -80,11 +80,11 @@ void getFreq(const int mPin) {
     if (value > max) max = value;
   }
 
-  if (max - min < FREQ_DC_BOUND) {
+  if (max - min < cal1.FREQ_DC_BOUND) {
     f_type = DC;
     freq = 0.0;
     return;
-  } else if (max > 512 - FREQ_DAC_BOUND && min > 512 - FREQ_DAC_BOUND || max < 512 + FREQ_DAC_BOUND && min < 512 + FREQ_DAC_BOUND) {
+  } else if (max > 512 - cal1.FREQ_DC_BOUND && min > 512 - cal1.FREQ_DC_BOUND || max < 512 + cal1.FREQ_DC_BOUND && min < 512 + cal1.FREQ_DC_BOUND) {
     f_type = DAC;
   } else {
     f_type = AC;
@@ -93,7 +93,7 @@ void getFreq(const int mPin) {
   uint16_t Q1 = (3 * min + max) / 4;
   uint16_t Q3 = (min + 3 * max) / 4;
 
-  timeOut *= FREQ_ITR;
+  timeOut *= config.FREQ_ITR;
   start = micros();
 
   while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
@@ -102,7 +102,7 @@ void getFreq(const int mPin) {
     ;
 
   start = micros();
-  for (uint16_t i = 0; i < FREQ_ITR; i++) {
+  for (uint16_t i = 0; i < config.FREQ_ITR; i++) {
     while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
       ;
     while ((analogRead(mPin) <= Q3) && ((micros() - start) < timeOut))
@@ -111,7 +111,7 @@ void getFreq(const int mPin) {
   uint32_t stop = micros();
 
   float wavelength = stop - start;
-  freq = FREQ_ITR * 1e6 / wavelength;
+  freq = config.FREQ_ITR * 1e6 / wavelength;
 }
 
 uint16_t ACSCal(const int mPin) {
@@ -122,10 +122,10 @@ uint16_t ACSCal(const int mPin) {
 
   uint32_t sum = 0;
 
-  for (uint16_t i = 0; i < MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     sum += analogRead(mPin);
-    delayMicroseconds(MEASUREMENT_DELAY);
+    delayMicroseconds(config.MEASUREMENT_DELAY);
   }
 
-  return (sum / MEASUREMENT_ITR);
+  return ((sum / config.MEASUREMENT_ITR) - 512);
 }

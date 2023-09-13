@@ -28,12 +28,12 @@ void updateDisplay() {
     ssd1306_printFixed(0, 56, "m: I", STYLE_NORMAL);
   }
 
-   if (f_type == AC) {
-      ssd1306_printFixed(40,  56, "f: AC", STYLE_NORMAL);
+  if (f_type == AC) {
+    ssd1306_printFixed(40, 56, "f: AC", STYLE_NORMAL);
   } else if (f_type == DAC) {
-      ssd1306_printFixed(40,  56, "f: DAC", STYLE_NORMAL);
+    ssd1306_printFixed(40, 56, "f: DAC", STYLE_NORMAL);
   } else {
-      ssd1306_printFixed(40,  56, "f: DC", STYLE_NORMAL);
+    ssd1306_printFixed(40, 56, "f: DC", STYLE_NORMAL);
   }
 }
 

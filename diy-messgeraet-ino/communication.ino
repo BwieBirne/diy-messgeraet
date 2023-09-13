@@ -8,7 +8,7 @@ void serialEvent() {
       Serial.read();
     }
 
-    uint8_t statusInt = Serial.parseInt();
+    int statusInt = Serial.parseInt();
 
     if (statusInt == 100) {
       Serial.println(statusInt);
