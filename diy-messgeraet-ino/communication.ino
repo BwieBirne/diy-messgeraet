@@ -12,9 +12,18 @@ void serialEvent() {
 
     if (statusInt == 100) {
       Serial.println(statusInt);
+      //Serial.println(config);
+      //Serial.println(cal1);
     } else if (statusInt == 101) {
       Serial.println(statusInt);
-      Serial.println(1);
+      Serial.println(millis());
+      Serial.println(m_type);
+      Serial.println(f_type);
+      Serial.println(freq);
+      Serial.println(current_U);
+      Serial.println(current_I);
+    } else if (statusInt == 110) {
+      
     }
   }
 }

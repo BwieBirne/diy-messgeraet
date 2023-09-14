@@ -124,8 +124,11 @@ uint16_t ACSCal(const int mPin) {
 
   for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
     sum += analogRead(mPin);
-    delayMicroseconds(config.MEASUREMENT_DELAY);
+    delayMicroseconds(1);
   }
+
+  Serial.print("I_OFFSET: ");
+  Serial.println((sum / config.MEASUREMENT_ITR) - 512);
 
   return ((sum / config.MEASUREMENT_ITR) - 512);
 }

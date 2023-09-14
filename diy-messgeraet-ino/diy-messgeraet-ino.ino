@@ -80,7 +80,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - Version: 1.00.00");
+  Serial.println("\nMessgerät - Version: 1.00.01");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
   Serial.println("Bereit");
