@@ -44,17 +44,21 @@ typedef struct calibration {
   const uint8_t FREQ_DAC_BOUND = 4;
 };
 
+//measurement
+typedef struct measurement {
+  uint32_t time = 0;  //milliseconds
+  enum frequency_type f_type = DC;
+  enum measurement_type m_type = U;
+  float current_U = 0.0f;
+  float current_I = 0.0f;
+  float freq = 0.0;
+};
+
 #define SQRT2 1.4142
 
 struct configuration config;
 struct calibration cal1;
-
-//varibales
-enum frequency_type f_type = DC;
-enum measurement_type m_type = U;
-float current_U = 0.0f;
-float current_I = 0.0f;
-float freq = 0.0;
+struct measurement m;
 
 bool updateVisuals = false;
 
@@ -70,6 +74,7 @@ uint32_t m_timer = 0;
 void setup() {
 
   Serial.begin(115200);
+  Serial.setTimeout(1000);
 
   pinMode(U_PIN, INPUT);
   pinMode(I_PIN, INPUT);
@@ -80,7 +85,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - Version: 1.00.01");
+  Serial.println("\nMessgerät - Version: 1.00.02");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
   Serial.println("Bereit");
@@ -100,11 +105,12 @@ void timer() {
 
   if (now - m_timer > config.MEASUREMENT_INTERVAL) {
     m_timer = now;
-    if (m_type == U) {
-      current_U = getVoltage(U_PIN);
+    m.time = now;
+    if (m.m_type == U) {
+      m.current_U = getVoltage(U_PIN);
     } else {
-      getFreq(I_PIN);
-      current_I = getCurrent(I_PIN);
+      m.freq = getFreq(I_PIN);
+      m.current_I = getCurrent(I_PIN);
     }
     updateVisuals = true;
   }
@@ -124,12 +130,12 @@ void controls() {
     return;
   } else if (digitalRead(BTN1_PIN) && btn1Lock) {
     btn1Lock = false;
-    if (m_type == U) {
-      m_type = I;
-      current_U = 0;
+    if (m.m_type == U) {
+      m.m_type = I;
+      m.current_U = 0;
     } else {
-      m_type = U;
-      current_I = 0;
+      m.m_type = U;
+      m.current_I = 0;
     }
     updateVisuals = true;
     return;
@@ -140,15 +146,15 @@ void controls() {
     return;
   } else if (digitalRead(BTN2_PIN) && btn2Lock) {
     btn2Lock = false;
-    if (m_type == I) {
+    if (m.m_type == I) {
       cal1.I_OFFSET = ACSCal(I_PIN);
     } else {
-      if (f_type == DC) {
-        f_type = DAC;
-      } else if (f_type == DAC) {
-        f_type = AC;
+      if (m.f_type == DC) {
+        m.f_type = DAC;
+      } else if (m.f_type == DAC) {
+        m.f_type = AC;
       } else {
-        f_type = DC;
+        m.f_type = DC;
       }
     }
     updateVisuals = true;

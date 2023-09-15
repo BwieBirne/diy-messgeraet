@@ -10,20 +10,29 @@ void serialEvent() {
 
     int statusInt = Serial.parseInt();
 
-    if (statusInt == 100) {
+    if (statusInt == 101) {
+
       Serial.println(statusInt);
-      //Serial.println(config);
-      //Serial.println(cal1);
-    } else if (statusInt == 101) {
-      Serial.println(statusInt);
-      Serial.println(millis());
-      Serial.println(m_type);
-      Serial.println(f_type);
-      Serial.println(freq);
-      Serial.println(current_U);
-      Serial.println(current_I);
+      Serial.write((byte*)&config, sizeof(configuration));
+      Serial.write((byte*)&cal1, sizeof(calibration));
+      //Serial.println();
     } else if (statusInt == 110) {
-      
+
+      Serial.println(statusInt);
+      Serial.write((byte*)&m, sizeof(measurement));
+      //Serial.println();
+    } else if (statusInt == 111) {
+
+      Serial.println(statusInt);
+      //Rohwerte aus Speicher, unverarbeitet
+    } else if (statusInt == 120) {
+
+      Serial.println(statusInt);
+      uint8_t configBytes = Serial.readBytes((byte*)&config, sizeof(configuration));
+      uint8_t calBytes = Serial.readBytes((byte*)&cal1, sizeof(calibration));
+      Serial.println(configBytes);
+      Serial.println(calBytes);
+      //EEPROM speichern
     }
   }
 }

@@ -20,7 +20,7 @@ float getVoltage(const int mPin) {
   max -= cal1.U_ERROR;
   min += cal1.U_ERROR;
 
-  if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
+  if (m.f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
 
   avg = avg / config.MEASUREMENT_ITR;
 
@@ -55,7 +55,7 @@ float getCurrent(const int mPin) {
   max -= cal1.I_ERROR;
   min += cal1.I_ERROR;
 
-  if (f_type != DC) {
+  if (m.f_type != DC) {
     if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (cal1.I_DIVIDER));
     else return ((max + ((min - max) / (SQRT2))) / (cal1.I_DIVIDER));
   }
@@ -66,7 +66,7 @@ float getCurrent(const int mPin) {
   return (avg / cal1.I_DIVIDER);
 }
 
-void getFreq(const int mPin) {
+float getFreq(const int mPin) {
 
   uint16_t max = 0;
   uint16_t min = 0;
@@ -81,13 +81,13 @@ void getFreq(const int mPin) {
   }
 
   if ((max - min) < cal1.FREQ_DC_BOUND) {
-    f_type = DC;
-    freq = 0.0;
+    m.f_type = DC;
+    m.freq = 0.0;
     return;
   } else if ((max > (512 - cal1.FREQ_DC_BOUND) && min > (512 - cal1.FREQ_DC_BOUND)) || (max < (512 + cal1.FREQ_DC_BOUND) && min < (512 + cal1.FREQ_DC_BOUND))) {
-    f_type = DAC;
+    m.f_type = DAC;
   } else {
-    f_type = AC;
+    m.f_type = AC;
   }
 
   uint16_t Q1 = (3 * min + max) / 4;
@@ -111,7 +111,7 @@ void getFreq(const int mPin) {
   uint32_t stop = micros();
 
   float wavelength = stop - start;
-  freq = config.FREQ_ITR * 1e6 / wavelength;
+  return (config.FREQ_ITR * 1e6 / wavelength);
 }
 
 uint16_t ACSCal(const int mPin) {

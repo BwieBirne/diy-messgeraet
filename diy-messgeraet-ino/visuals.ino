@@ -9,9 +9,9 @@ void updateDisplay() {
   const char I_char[DISPLAY_CHAR_LENGTH];
   const char f_char[DISPLAY_CHAR_LENGTH];
 
-  dtostrf(current_U, 6, 2, U_char);
-  dtostrf(current_I, 6, 2, I_char);
-  dtostrf(freq, 6, 2, f_char);
+  dtostrf(m.current_U, 6, 2, U_char);
+  dtostrf(m.current_I, 6, 2, I_char);
+  dtostrf(m.freq, 6, 2, f_char);
 
   ssd1306_setFixedFont(ssd1306xled_font8x16);
   ssd1306_printFixed(0, 8, "U in V: ", STYLE_NORMAL);
@@ -22,15 +22,15 @@ void updateDisplay() {
   ssd1306_printFixed(0, 40, "f in Hz:", STYLE_NORMAL);
   ssd1306_printFixed(60, 40, f_char, STYLE_BOLD);
 
-  if (m_type == U) {
+  if (m.m_type == U) {
     ssd1306_printFixed(0, 56, "m: U", STYLE_NORMAL);
   } else {
     ssd1306_printFixed(0, 56, "m: I", STYLE_NORMAL);
   }
 
-  if (f_type == AC) {
+  if (m.f_type == AC) {
     ssd1306_printFixed(40, 56, "f: AC", STYLE_NORMAL);
-  } else if (f_type == DAC) {
+  } else if (m.f_type == DAC) {
     ssd1306_printFixed(40, 56, "f: DAC", STYLE_NORMAL);
   } else {
     ssd1306_printFixed(40, 56, "f: DC", STYLE_NORMAL);
@@ -40,49 +40,49 @@ void updateDisplay() {
 void serialInfoBlock() {
 
   Serial.print("t: ");
-  Serial.println(millis());
+  Serial.println(m.time);
   Serial.print("mtype: ");
-  if (m_type == U) {
+  if (m.m_type == U) {
     Serial.println("U");
   } else {
     Serial.println("I");
   }
   Serial.print("ftype: ");
-  if (f_type == AC) {
+  if (m.f_type == AC) {
     Serial.println("AC");
-  } else if (f_type == DAC) {
+  } else if (m.f_type == DAC) {
     Serial.println("DAC");
   } else {
     Serial.println("DC");
   }
   Serial.print("f in Hz: ");
-  Serial.println(freq);
+  Serial.println(m.freq);
   Serial.print("U in V: ");
-  Serial.println(current_U);
+  Serial.println(m.current_U);
   Serial.print("I in A: ");
-  Serial.println(current_I);
+  Serial.println(m.current_I);
   Serial.println("----------------------------------------------");
 }
 
 void serialInfoTab() {
 
-  Serial.print(millis());
+  Serial.print(m.time);
   Serial.print("\t");
-  if (m_type == U) {
+  if (m.m_type == U) {
     Serial.print("U\t");
   } else {
     Serial.print("I\t");
   }
-  if (f_type == AC) {
+  if (m.f_type == AC) {
     Serial.print("AC\t");
-  } else if (f_type == DAC) {
+  } else if (m.f_type == DAC) {
     Serial.print("DAC\t");
   } else {
     Serial.print("DC\t");
   }
-  Serial.print(freq);
+  Serial.print(m.freq);
   Serial.print("\t");
-  Serial.print(current_U);
+  Serial.print(m.current_U);
   Serial.print("\t");
-  Serial.println(current_I);
+  Serial.println(m.current_I);
 }
