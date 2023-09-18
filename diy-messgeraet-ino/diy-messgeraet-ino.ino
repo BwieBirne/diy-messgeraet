@@ -5,6 +5,7 @@
 #include "ssd1306.h"  //Alexey Dynda
 #include <EEPROM.h>
 //#include <WiFiNINA.h>
+//#include <ArduinoBLE.h>
 
 //enums
 enum frequency_type { AC,
@@ -37,9 +38,10 @@ typedef struct configuration {
 typedef struct calibration {
   const float U_DIVIDER = 40.3f;
   const float I_DIVIDER = 40.0f;
+  //int8_t U_OFFSET = 0;
   int8_t I_OFFSET = 0;
-  uint8_t I_ERROR = 4;
   uint8_t U_ERROR = 12;
+  uint8_t I_ERROR = 4;
   const uint8_t FREQ_DC_BOUND = 16;
   const uint8_t FREQ_DAC_BOUND = 4;
 };
@@ -51,7 +53,7 @@ typedef struct measurement {
   enum measurement_type m_type = U;
   float current_U = 0.0f;
   float current_I = 0.0f;
-  float freq = 0.0;
+  float freq = 0.0f;
 };
 
 #define SQRT2 1.4142
@@ -85,10 +87,10 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - Version: 1.00.02");
+  Serial.println("\nMessgerät - 003");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
-  Serial.println("Bereit");
+  Serial.println("Bereit.");
   Serial.println("t\tmtype\tftype\tf in Hz\tU in V\tI in A");
   Serial.println("----------------------------------------------");
 }
@@ -168,8 +170,10 @@ void getData() {
     EEPROM.put(EEPROM_CHECK_ADDR, EEPROM_CHECK_VALUE);
     EEPROM.put(EEPROM_CONFIG_ADDR, config);
     EEPROM.put(EEPROM_CAL_ADDR, cal1);
+    Serial.println("Daten initial gespeichert.");
   } else {
     EEPROM.get(EEPROM_CONFIG_ADDR, config);
     EEPROM.get(EEPROM_CAL_ADDR, cal1);
+    Serial.println("Daten geladen.");
   }
 }

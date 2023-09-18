@@ -25,6 +25,7 @@ void serialEvent() {
 
       Serial.println(statusInt);
       //Rohwerte aus Speicher, unverarbeitet
+      //Serial.println();
     } else if (statusInt == 120) {
 
       Serial.println(statusInt);
