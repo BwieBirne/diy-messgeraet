@@ -114,7 +114,7 @@ float getFreq(const int mPin) {
   return (config.FREQ_ITR * 1e6 / wavelength);
 }
 
-uint16_t ACSCal(const int mPin) {
+int8_t ACSCal(const int mPin) {
 
   //setzt voraus, dass I zum Zeitpunkt der Kalibrierung null ist
   Serial.println("Kalibrierung...");
@@ -128,7 +128,7 @@ uint16_t ACSCal(const int mPin) {
   }
 
   Serial.print("I_OFFSET: ");
-  Serial.println((sum / config.MEASUREMENT_ITR) - 512);
+  Serial.println((int8_t)(sum / config.MEASUREMENT_ITR) - 512);
 
-  return ((sum / config.MEASUREMENT_ITR) - 512);
+  return ((int8_t)(sum / config.MEASUREMENT_ITR) - 512);
 }
