@@ -82,8 +82,7 @@ float getFreq(const int mPin) {
 
   if ((max - min) < cal1.FREQ_DC_BOUND) {
     m.f_type = DC;
-    m.freq = 0.0;
-    return;
+    return (0.0f);
   } else if ((max > (512 - cal1.FREQ_DC_BOUND) && min > (512 - cal1.FREQ_DC_BOUND)) || (max < (512 + cal1.FREQ_DC_BOUND) && min < (512 + cal1.FREQ_DC_BOUND))) {
     m.f_type = DAC;
   } else {
@@ -128,7 +127,7 @@ int8_t ACSCal(const int mPin) {
   }
 
   Serial.print("I_OFFSET: ");
-  Serial.println((int8_t)(sum / config.MEASUREMENT_ITR) - 512);
+  Serial.println((int32_t)(sum / config.MEASUREMENT_ITR) - 512);
 
-  return ((int8_t)(sum / config.MEASUREMENT_ITR) - 512);
+  return ((sum / config.MEASUREMENT_ITR) - 512);
 }

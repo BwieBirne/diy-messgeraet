@@ -37,7 +37,7 @@ typedef struct configuration {
 //calibration
 typedef struct calibration {
   const float U_DIVIDER = 40.3f;
-  const float I_DIVIDER = 40.0f;
+  const float I_DIVIDER = 37.3f;
   //int8_t U_OFFSET = 0;
   int8_t I_OFFSET = 0;
   uint8_t U_ERROR = 12;
