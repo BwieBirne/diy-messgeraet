@@ -86,3 +86,13 @@ void serialInfoTab() {
   Serial.print("\t");
   Serial.println(m.current_I);
 }
+
+void serialMinMaxAvg(int min, int max, int avg) {
+
+  Serial.print("Min: ");
+  Serial.println(min);
+  Serial.print("Max: ");
+  Serial.println(max);
+  Serial.print("Avg: ");
+  Serial.println(avg);
+}

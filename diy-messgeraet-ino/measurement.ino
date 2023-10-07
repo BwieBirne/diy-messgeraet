@@ -1,5 +1,5 @@
 
-void sensorRead(const int mPin, int16_t* min, int16_t* max, uint32_t* avg, uint16_t wavelength, const uint8_t itr) {
+void sensorRead(const int mPin, int16_t* min, int16_t* max, int16_t* avg, uint16_t wavelength, const uint8_t itr) {
 
   uint32_t minSum = 0;
   uint32_t maxSum = 0;
@@ -37,12 +37,20 @@ float getVoltage(const int mPin) {
 
   int16_t min = 1023;
   int16_t max = 0;
-  uint32_t avg = 0;
+  int16_t avg = 0;
 
   sensorRead(mPin, &min, &max, &avg, m.wavelength, config.WAVE_ITR);
 
-  max -= cal1.U_ERROR;
+  if (!avg) return (0.0f);
+
   min += cal1.U_ERROR;
+  max -= cal1.U_ERROR;
+
+  min -= min * cal1.U_CORRECTION_FACTOR - cal1.U_CORRECTION_NORM;
+  max -= max * cal1.U_CORRECTION_FACTOR - cal1.U_CORRECTION_NORM;
+  avg -= avg * cal1.U_CORRECTION_FACTOR - cal1.U_CORRECTION_NORM;
+
+  serialMinMaxAvg(min, max, avg);
 
   if (m.f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
 
@@ -54,14 +62,15 @@ float getCurrent(const int mPin) {
 
   int16_t min = 1023;
   int16_t max = 0;
-  uint32_t avg = 0;
+  int16_t avg = 0;
 
   sensorRead(mPin, &min, &max, &avg, m.wavelength, config.WAVE_ITR);
 
   min -= 512 + cal1.I_OFFSET;
   max -= 512 + cal1.I_OFFSET;
-  max -= cal1.I_ERROR;
+  avg -= 512 + cal1.I_OFFSET;
   min += cal1.I_ERROR;
+  max -= cal1.I_ERROR;
 
   if (m.f_type != DC) {
     if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (cal1.I_DIVIDER));
@@ -75,7 +84,7 @@ float getFreq(const int mPin) {
 
   int16_t min = 1023;
   int16_t max = 0;
-  uint32_t avg = 0;
+  int16_t avg = 0;
   uint16_t timeOut = 1e6 / config.MIN_FREQ;
 
   sensorRead(mPin, &min, &max, &avg, timeOut, 1);
