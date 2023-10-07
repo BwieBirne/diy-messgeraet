@@ -27,9 +27,8 @@ bool btn2Lock = false;
 //configuration
 typedef struct configuration {
   const uint16_t MEASUREMENT_INTERVAL = 1000;  //milliseconds
-  const uint16_t MEASUREMENT_ITR = 500;
-  const uint16_t AR_DURATION = 0;        //microseconds
-  const uint16_t MEASUREMENT_DELAY = 1;  //microseconds
+  const uint8_t WAVE_ITR = 10;
+  const uint8_t CAL_ITR = 100;
   const uint8_t MIN_FREQ = 50;
   const uint8_t FREQ_ITR = 10;
 };
@@ -54,6 +53,7 @@ typedef struct measurement {
   float current_U = 0.0f;
   float current_I = 0.0f;
   float freq = 0.0f;
+  uint16_t wavelength = 20000;  //microseconds
 };
 
 #define SQRT2 1.4142
@@ -87,7 +87,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 003");
+  Serial.println("\nMessgerät - 071023.1");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
   Serial.println("Bereit.");

@@ -1,28 +1,50 @@
 
+void sensorRead(const int mPin, int16_t* min, int16_t* max, uint32_t* avg, uint16_t wavelength, const uint8_t itr) {
+
+  uint32_t minSum = 0;
+  uint32_t maxSum = 0;
+  uint32_t avgSum = 0;
+
+  for (uint8_t i = 0; i < itr; i++) {
+
+    uint16_t count = 0;
+    int16_t newMin = 1023;
+    int16_t newMax = 0;
+    uint32_t newAvg = 0;
+
+    uint32_t start = micros();
+    while (micros() - start < wavelength) {
+      uint16_t value = analogRead(mPin);
+      if (value < newMin) newMin = value;
+      if (value > newMax) newMax = value;
+      newAvg += value;
+      count++;
+    }
+    newAvg /= count;
+
+    minSum += newMin;
+    maxSum += newMax;
+    avgSum += newAvg;
+  }
+
+  *min = minSum / itr;
+  *max = maxSum / itr;
+  *avg = avgSum / itr;
+}
+
+
 float getVoltage(const int mPin) {
 
-  uint16_t mArray[config.MEASUREMENT_ITR];
-  uint32_t avg = 0;
   int16_t min = 1023;
   int16_t max = 0;
+  uint32_t avg = 0;
 
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
-    mArray[i] = analogRead(mPin);
-    delayMicroseconds(config.MEASUREMENT_DELAY);
-  }
-
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
-    if (mArray[i] < min) min = mArray[i];
-    if (mArray[i] > max) max = mArray[i];
-    avg += mArray[i];
-  }
+  sensorRead(mPin, &min, &max, &avg, m.wavelength, config.WAVE_ITR);
 
   max -= cal1.U_ERROR;
   min += cal1.U_ERROR;
 
   if (m.f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
-
-  avg = avg / config.MEASUREMENT_ITR;
 
   return (avg / cal1.U_DIVIDER);
 }
@@ -30,25 +52,11 @@ float getVoltage(const int mPin) {
 
 float getCurrent(const int mPin) {
 
-  uint16_t mArray[config.MEASUREMENT_ITR];
-  int32_t avg = 0;
   int16_t min = 1023;
   int16_t max = 0;
+  uint32_t avg = 0;
 
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
-    mArray[i] = analogRead(mPin);
-    delayMicroseconds(config.MEASUREMENT_DELAY);
-  }
-
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
-    if (mArray[i] < min) min = mArray[i];
-    if (mArray[i] > max) max = mArray[i];
-    avg += mArray[i];
-  }
-
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
-    mArray[i] -= 512 + cal1.I_OFFSET;
-  }
+  sensorRead(mPin, &min, &max, &avg, m.wavelength, config.WAVE_ITR);
 
   min -= 512 + cal1.I_OFFSET;
   max -= 512 + cal1.I_OFFSET;
@@ -60,25 +68,17 @@ float getCurrent(const int mPin) {
     else return ((max + ((min - max) / (SQRT2))) / (cal1.I_DIVIDER));
   }
 
-  avg = avg - ((long)config.MEASUREMENT_ITR * (512 + cal1.I_OFFSET));
-  avg = avg / config.MEASUREMENT_ITR;
-
   return (avg / cal1.I_DIVIDER);
 }
 
 float getFreq(const int mPin) {
 
-  uint16_t max = 0;
-  uint16_t min = 0;
-  max = min = analogRead(mPin);
-  uint32_t timeOut = 1e6 / config.MIN_FREQ;
+  int16_t min = 1023;
+  int16_t max = 0;
+  uint32_t avg = 0;
+  uint16_t timeOut = 1e6 / config.MIN_FREQ;
 
-  uint32_t start = micros();
-  while (micros() - start < timeOut) {
-    uint16_t value = analogRead(mPin);
-    if (value < min) min = value;
-    if (value > max) max = value;
-  }
+  sensorRead(mPin, &min, &max, &avg, timeOut, 1);
 
   if ((max - min) < cal1.FREQ_DC_BOUND) {
     m.f_type = DC;
@@ -93,7 +93,7 @@ float getFreq(const int mPin) {
   uint16_t Q3 = (min + 3 * max) / 4;
 
   timeOut *= config.FREQ_ITR;
-  start = micros();
+  uint32_t start = micros();
 
   while ((analogRead(mPin) > Q1) && ((micros() - start) < timeOut))
     ;
@@ -110,6 +110,7 @@ float getFreq(const int mPin) {
   uint32_t stop = micros();
 
   float wavelength = stop - start;
+  //m.wavelength = wavelength / config.FREQ_ITR;
   return (config.FREQ_ITR * 1e6 / wavelength);
 }
 
@@ -121,13 +122,12 @@ int8_t ACSCal(const int mPin) {
 
   uint32_t sum = 0;
 
-  for (uint16_t i = 0; i < config.MEASUREMENT_ITR; i++) {
+  for (uint16_t i = 0; i < config.CAL_ITR; i++) {
     sum += analogRead(mPin);
-    delayMicroseconds(1);
   }
 
   Serial.print("I_OFFSET: ");
-  Serial.println((int32_t)(sum / config.MEASUREMENT_ITR) - 512);
+  Serial.println((int32_t)(sum / config.CAL_ITR) - 512);
 
-  return ((sum / config.MEASUREMENT_ITR) - 512);
+  return ((sum / config.CAL_ITR) - 512);
 }
