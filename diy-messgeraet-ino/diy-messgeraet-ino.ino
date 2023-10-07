@@ -39,12 +39,7 @@ typedef struct calibration {
   const float I_DIVIDER = 40.0f;             //Norm: 0.2A
   const float U_CORRECTION_FACTOR = 0.088f;  //Norm: 1V
   const float U_CORRECTION_NORM = 3.3f;      //Norm: 1V
-  const float I_CORRECTION_FACTOR = 0.0f;    //Norm: 0.2A
-  const float I_CORRECTION_NORM = 0.0f;      //Norm: 0.2A
-  int8_t U_OFFSET = 0;
   int8_t I_OFFSET = 0;
-  uint8_t U_ERROR = 8;
-  uint8_t I_ERROR = 4;
   const uint8_t FREQ_DC_BOUND = 16;
   const uint8_t FREQ_DAC_BOUND = 4;
 };
@@ -91,7 +86,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 071023.3");
+  Serial.println("\nMessgerät - 071023.4");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
   Serial.println("Bereit.");
