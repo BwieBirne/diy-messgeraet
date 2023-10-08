@@ -52,7 +52,7 @@ typedef struct measurement {
   float current_U = 0.0f;
   float current_I = 0.0f;
   float freq = 0.0f;
-  uint16_t wavelength = 20000;  //microseconds
+  uint16_t periodduration = 20000;  //microseconds
 };
 
 #define SQRT2 1.4142
@@ -86,7 +86,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 071023.4");
+  Serial.println("\nMessgerät - 081023.1");
   cal1.I_OFFSET = ACSCal(I_PIN);
 
   Serial.println("Bereit.");
