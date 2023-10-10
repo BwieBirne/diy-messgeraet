@@ -8,8 +8,8 @@ void sensorRead(const int mPin, int16_t* min, int16_t* max, int16_t* avg, uint16
   for (uint8_t i = 0; i < itr; i++) {
 
     uint16_t count = 0;
-    int16_t newMin = 1023;
-    int16_t newMax = 0;
+    uint16_t newMin = 1023;
+    uint16_t newMax = 0;
     uint32_t newAvg = 0;
 
     uint32_t start = micros();
