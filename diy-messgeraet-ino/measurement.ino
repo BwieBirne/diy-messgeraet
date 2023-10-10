@@ -8,8 +8,8 @@ void sensorRead(const int mPin, int16_t* min, int16_t* max, int16_t* avg, uint16
   for (uint8_t i = 0; i < itr; i++) {
 
     uint16_t count = 0;
-    uint16_t newMin = 1023;
-    uint16_t newMax = 0;
+    int16_t newMin = 1023;
+    int16_t newMax = 0;
     uint32_t newAvg = 0;
 
     uint32_t start = micros();
@@ -47,7 +47,7 @@ float getVoltage(const int mPin) {
   max -= max * cal1.U_CORRECTION_FACTOR - cal1.U_CORRECTION_NORM;
   avg -= avg * cal1.U_CORRECTION_FACTOR - cal1.U_CORRECTION_NORM;
 
-  serialMinMaxAvg(min, max, avg);
+  //serialMinMaxAvg(min, max, avg);
 
   if (m.f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal1.U_DIVIDER));
 
@@ -67,7 +67,7 @@ float getCurrent(const int mPin) {
   max -= 512 + cal1.I_OFFSET;
   avg -= 512 + cal1.I_OFFSET;
 
-  serialMinMaxAvg(min, max, avg);
+  //serialMinMaxAvg(min, max, avg);
 
   if (m.f_type != DC) {
     if (abs(max) > abs(min)) return ((min + ((max - min) / (SQRT2))) / (cal1.I_DIVIDER));
@@ -86,7 +86,7 @@ float getFreq(const int mPin) {
 
   sensorRead(mPin, &min, &max, &avg, maxPeriodduration, 1);
 
-  serialMinMaxAvg(min, max, avg);
+  //serialMinMaxAvg(min, max, avg);
 
   if ((max - min) < cal1.FREQ_DC_BOUND) {
     m.f_type = DC;
@@ -103,10 +103,12 @@ float getFreq(const int mPin) {
   uint16_t Q1 = (3 * min + max) / 4;
   uint16_t Q3 = (min + 3 * max) / 4;
 
+  /*
   Serial.print("Q1: ");
   Serial.println(Q1);
   Serial.print("Q3: ");
   Serial.println(Q3);
+  */
 
   maxPeriodduration *= config.FREQ_ITR;
   uint32_t start = micros();
