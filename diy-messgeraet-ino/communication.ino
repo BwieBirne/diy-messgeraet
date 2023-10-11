@@ -14,13 +14,16 @@ void serialEvent() {
 
       Serial.println(statusInt);
       Serial.write((byte*)&config, sizeof(configuration));
-      Serial.write((byte*)&cal1, sizeof(calibration));
-      //Serial.println();
+      Serial.println();
+      Serial.write((byte*)&calU, sizeof(calU));
+      Serial.println();
+      Serial.write((byte*)&calI, sizeof(calI));
+      Serial.println();
     } else if (statusInt == 110) {
 
       Serial.println(statusInt);
-      Serial.write((byte*)&m, sizeof(measurement));
-      //Serial.println();
+      Serial.write((byte*)&msm, sizeof(measurement));
+      Serial.println();
     } else if (statusInt == 111) {
 
       Serial.println(statusInt);
@@ -28,11 +31,15 @@ void serialEvent() {
       //Serial.println();
     } else if (statusInt == 120) {
 
+      struct configuration tempConfig;
+      struct calibration tempCalU[PINS_COUNT];
+      struct calibration tempCalI[PINS_COUNT];
       Serial.println(statusInt);
       uint8_t configBytes = Serial.readBytes((byte*)&config, sizeof(configuration));
-      uint8_t calBytes = Serial.readBytes((byte*)&cal1, sizeof(calibration));
+      uint8_t calUBytes = Serial.readBytes((byte*)&calU, sizeof(calU));
+      uint8_t calIBytes = Serial.readBytes((byte*)&calI, sizeof(calI));
       Serial.println(configBytes);
-      Serial.println(calBytes);
+      //Serial.println(calBytes);
       //EEPROM speichern
     }
   }
