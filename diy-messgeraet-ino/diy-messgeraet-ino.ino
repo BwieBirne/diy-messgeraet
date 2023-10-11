@@ -23,14 +23,14 @@ bool btn2Lock = false;
 typedef struct configuration {
   const uint8_t U_PINS[PINS_COUNT] = { A0, A0, A0 };
   const uint8_t I_PINS[PINS_COUNT] = { A3, A3, A3 };
-  const float CAL_POINTS[2] = { 1.0f, 20.0f }; //in V
   const uint8_t BTN1_PIN = 2;
   const uint8_t BTN2_PIN = 4;
-  const uint16_t MEASUREMENT_INTERVAL = 1000;  //milliseconds
-  const uint8_t MEASUREMENT_ITR = 10;
-  const uint8_t MIN_FREQ = 50;
-  const uint8_t FREQ_ITR = 10;
-  const uint16_t STD_PERIODDURATION = 20000;  //microseconds
+  const float CAL_POINTS[2] = { 1.0f, 20.0f };  //in V
+  const uint16_t MEASUREMENT_INTERVAL = 1000;   //milliseconds
+  const uint8_t MEASUREMENT_ITR = 1;
+  const uint8_t FREQ_ITR = 1;
+  const uint16_t STD_PERIODDURATION = 20000;  //microseconds - 50Hz
+  const uint8_t DAC_THRESHOLD = 12;
 };
 
 //calibration
@@ -89,8 +89,13 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 111023.1");
+  Serial.println("\nMessgerät - 121023.1");
+
+  if (senCal(A0, &config, &calU[0])) Serial.println("Sensor konnte nicht kalibriert werden!");
+  else Serial.println("Kalibrierung erfolgreich!");
+
   Serial.println("Bereit.");
+
   printTabHeadSerial();
 }
 

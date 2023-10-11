@@ -64,16 +64,54 @@ float getCurrent(const uint8_t mPin, struct configuration *conf, struct calibrat
 
 float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration *cal) {
 
-  return (0.0f);
+  int16_t min = 1023;
+  int16_t max = 0;
+  int16_t avg = 0;
+
+  sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
+
+  if (max - min > conf->DAC_THRESHOLD) return (0.0f);
+
+  //Frequenz bestimmen
+
+  return (50.0f);
 }
 
 int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration *cal) {
 
   int16_t min = 1023;
   int16_t max = 0;
-  int16_t avg = 0;
+  int16_t avg1 = 0;
 
-  sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
+  Serial.println("Die Kalibrierung muss unter Gleichstrom erfolgen!");
+  Serial.print("U auf ");
+  Serial.print(conf->CAL_POINTS[0]);
+  Serial.println(" V stellen und anschließen BTN1 drücken.");
+
+  while (digitalRead(conf->BTN1_PIN));
+
+  sensorRead(mPin, &min, &max, &avg1, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
+
+  if (max - min > conf->DAC_THRESHOLD) return 1;
+
+  Serial.print("U auf ");
+  Serial.print(conf->CAL_POINTS[1]);
+  Serial.println(" V stellen und anschließen BTN1 drücken.");
+
+  int16_t avg2 = 0;
+  
+  while (digitalRead(conf->BTN1_PIN));
+
+  sensorRead(mPin, &min, &max, &avg2, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
+
+  if (max - min > 12) return 1;
+
+  //Berechnung U_DIVIDER
+  Serial.println((avg2-avg1)/(conf->CAL_POINTS[1]-conf->CAL_POINTS[0]));
+
+  //Berechnung U_CORRECTION_FACTOR und U_CORRECTION_NORM
+
+  //while(1);
 
   return 0;
 }
