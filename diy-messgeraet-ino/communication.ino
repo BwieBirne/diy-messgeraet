@@ -37,7 +37,9 @@ void serialEvent() {
       Serial.readBytes((byte*)&config, sizeof(configuration));
       Serial.readBytes((byte*)&calU, sizeof(calU));
       Serial.readBytes((byte*)&calI, sizeof(calI));
-      //EEPROM speichern
+      //EEPROM.put(EEPROM_CONFIG_ADDR, config);
+      //EEPROM.put(EEPROM_CALU_ADDR, calU);
+      //EEPROM.put(EEPROM_CALI_ADDR, calI);
     }
   }
 }

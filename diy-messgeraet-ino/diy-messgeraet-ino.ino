@@ -13,7 +13,16 @@ enum frequency_type { DC,
 enum measurement_type { U,
                         I };
 
+#define CONFIG_MODE false
 #define PINS_COUNT 3
+#define BAUD_RATE 115200
+
+//EEPROM
+#define EEPROM_CHECK_ADDR 0
+#define EEPROM_CHECK_VALUE 1
+#define EEPROM_CONFIG_ADDR 10
+#define EEPROM_CALU_ADDR 100
+#define EEPROM_CALI_ADDR 200
 
 //locks
 bool btn1Lock = false;
@@ -25,20 +34,19 @@ typedef struct configuration {
   const uint8_t I_PINS[PINS_COUNT] = { A3, A3, A3 };
   const uint8_t BTN1_PIN = 2;
   const uint8_t BTN2_PIN = 4;
-  const float CAL_POINTS[2] = { 1.0f, 20.0f };  //in V
-  const uint16_t MEASUREMENT_INTERVAL = 1000;   //milliseconds
-  const uint8_t MEASUREMENT_ITR = 1;
-  const uint8_t FREQ_ITR = 1;
+  const float CAL_POINTS[2] = { 1.0f, 5.0f };  //in V
+  const uint16_t MEASUREMENT_INTERVAL = 1000;  //milliseconds
+  const uint8_t MEASUREMENT_ITR = 2;
+  const uint8_t FREQ_ITR = 2;
   const uint16_t STD_PERIODDURATION = 20000;  //microseconds - 50Hz
-  const uint8_t DAC_THRESHOLD = 12;
 };
 
 //calibration
 typedef struct calibration {
-  const float U_DIVIDER = 37.0f;             //Norm: 1V
-  const float U_CORRECTION_FACTOR = 0.088f;  //Norm: 1V
-  const float U_CORRECTION_NORM = 3.3f;      //Norm: 1V
-  const float I_RESISTANCE = 10.0f;          //Ohm
+  float U_DIVIDER = 40.5f;
+  float U_OFFSET = 0.0617f;
+  float I_RESISTANCE = 10.0f;  //Ohm
+  uint8_t DAC_THRESHOLD = 20;
 };
 
 //measurement
@@ -49,28 +57,21 @@ typedef struct measurement {
   float current_f[2] = { 0.0f, 0.0f };                 //in Hz - 0.0f is DC
 };
 
+//constants
 #define SQRT2 1.4142
-#define BAUD_RATE 115200
-
-bool updateVisuals = false;
-
-enum measurement_type m_type = U;
-enum frequency_type f_type = DC;
-
-//EEPROM
-#define EEPROM_CHECK_ADDR 0
-#define EEPROM_CHECK_VALUE 1
-#define EEPROM_CONFIG_ADDR 10
-#define EEPROM_CALU_ADDR 100
-#define EEPROM_CALI_ADDR 200
 
 //timer
 uint32_t m_timer = 0;
+
+enum measurement_type m_type = U;
+enum frequency_type f_type = DC;
 
 struct configuration config;
 struct calibration calU[PINS_COUNT];
 struct calibration calI[PINS_COUNT];
 struct measurement msm;
+
+bool updateVisuals = false;
 
 
 void setup() {
@@ -91,8 +92,16 @@ void setup() {
   //getData();
   Serial.println("\nMessgerät - 121023.1");
 
-  if (senCal(A0, &config, &calU[0])) Serial.println("Sensor konnte nicht kalibriert werden!");
-  else Serial.println("Kalibrierung erfolgreich!");
+  if (CONFIG_MODE) {
+    //hier Konfiguration für Kalibrierung anpassen
+    if (senCal(config.U_PINS[0], &config, &calU[0])) {
+      Serial.println("Sensor konnte nicht kalibriert werden!");
+    } else {
+      Serial.println("Kalibrierung erfolgreich!");
+      //EEPROM.put(EEPROM_CALU_ADDR, calU);
+      //EEPROM.put(EEPROM_CALI_ADDR, calI);
+    }
+  }
 
   Serial.println("Bereit.");
 

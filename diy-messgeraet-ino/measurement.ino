@@ -43,15 +43,11 @@ float getVoltage(const uint8_t mPin, struct configuration *conf, struct calibrat
 
   if (!avg) return (0.0f);
 
-  min -= min * cal->U_CORRECTION_FACTOR - cal->U_CORRECTION_NORM;
-  max -= max * cal->U_CORRECTION_FACTOR - cal->U_CORRECTION_NORM;
-  avg -= avg * cal->U_CORRECTION_FACTOR - cal->U_CORRECTION_NORM;
-
-  //serialMinMaxAvg(min, max, avg);
+  //printMinMaxAvgSerial(min, max, avg);
 
   if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal->U_DIVIDER));
 
-  return (avg / cal->U_DIVIDER);
+  return (avg / cal->U_DIVIDER + cal->U_OFFSET);
 }
 
 
@@ -70,7 +66,7 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
 
   sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if (max - min > conf->DAC_THRESHOLD) return (0.0f);
+  if (max - min > 2 * cal->DAC_THRESHOLD) return (0.0f);
 
   //Frequenz bestimmen
 
@@ -86,32 +82,42 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
   Serial.println("Die Kalibrierung muss unter Gleichstrom erfolgen!");
   Serial.print("U auf ");
   Serial.print(conf->CAL_POINTS[0]);
-  Serial.println(" V stellen und anschließen BTN1 drücken.");
+  Serial.println(" V stellen und anschließend BTN1 drücken.");
 
   while (digitalRead(conf->BTN1_PIN));
+  while (!digitalRead(conf->BTN1_PIN));
 
   sensorRead(mPin, &min, &max, &avg1, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if (max - min > conf->DAC_THRESHOLD) return 1;
+  if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
 
   Serial.print("U auf ");
   Serial.print(conf->CAL_POINTS[1]);
-  Serial.println(" V stellen und anschließen BTN1 drücken.");
+  Serial.println(" V stellen und anschließend BTN1 drücken.");
 
   int16_t avg2 = 0;
-  
+
   while (digitalRead(conf->BTN1_PIN));
+  while (!digitalRead(conf->BTN1_PIN));
 
   sensorRead(mPin, &min, &max, &avg2, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if (max - min > 12) return 1;
+  if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
 
-  //Berechnung U_DIVIDER
-  Serial.println((avg2-avg1)/(conf->CAL_POINTS[1]-conf->CAL_POINTS[0]));
+  float uDiv = (avg2 - avg1) / (conf->CAL_POINTS[1] - conf->CAL_POINTS[0]);
+  float uOffset1 = conf->CAL_POINTS[0] - avg1 / uDiv;
+  float uOffset2 = conf->CAL_POINTS[1] - avg2 / uDiv;
+  float uOffset = (uOffset1 + uOffset1) / 2;
 
-  //Berechnung U_CORRECTION_FACTOR und U_CORRECTION_NORM
+  Serial.print("U_DIVIDER: ");
+  Serial.println(uDiv, 8);
+  Serial.print("U_OFFSET: ");
+  Serial.println(uOffset, 8);
 
-  //while(1);
+  cal->U_DIVIDER = uDiv;
+  cal->U_OFFSET = uOffset;
+
+  //while (1);
 
   return 0;
 }
