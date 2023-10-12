@@ -66,11 +66,28 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
 
   sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if (max - min > 2 * cal->DAC_THRESHOLD) return (0.0f);
+  if (max - min < 2 * cal->DAC_THRESHOLD) return (0.0f);
 
-  //Frequenz bestimmen
+  min += cal->DAC_THRESHOLD / 2;
+  max -= cal->DAC_THRESHOLD;
 
-  return (50.0f);
+  uint32_t perioddurationSum = 0;
+
+  for (int i = 0; i < conf->FREQ_ITR; i++) {
+    
+    while (analogRead(mPin) > min);
+    uint32_t start = micros();
+
+    while (analogRead(mPin) < max);
+    uint32_t stop = micros();
+  
+    perioddurationSum += 2 * (stop - start);
+  }
+
+  uint32_t periodduration = perioddurationSum / conf->FREQ_ITR;
+  float freq = (float)1 / periodduration;
+
+  return freq;
 }
 
 int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration *cal) {

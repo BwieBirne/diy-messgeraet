@@ -14,12 +14,15 @@ void printMeasurementDisplay(struct measurement *m) {
   dtostrf(m->current_f[0], 6, 2, f_char);
 
   ssd1306_setFixedFont(ssd1306xled_font8x16);
-  ssd1306_printFixed(0, 8, "U in V: ", STYLE_NORMAL);
-  ssd1306_printFixed(0, 24, "I in A: ", STYLE_NORMAL);
-  ssd1306_printFixed(0, 40, "f in Hz:", STYLE_NORMAL);
-  ssd1306_printFixed(60, 8, U_char, STYLE_BOLD);
-  ssd1306_printFixed(60, 24, I_char, STYLE_BOLD);
-  ssd1306_printFixed(60, 40, f_char, STYLE_BOLD);
+  ssd1306_printFixed(0, 8, "U:", STYLE_NORMAL);
+  ssd1306_printFixed(0, 24, "I:", STYLE_NORMAL);
+  ssd1306_printFixed(0, 40, "f:", STYLE_NORMAL);
+  ssd1306_printFixed(16, 8, U_char, STYLE_BOLD);
+  ssd1306_printFixed(16, 24, I_char, STYLE_BOLD);
+  ssd1306_printFixed(16, 40, f_char, STYLE_BOLD);
+  ssd1306_printFixed(56, 8, "V", STYLE_NORMAL);
+  ssd1306_printFixed(56, 24, "A", STYLE_NORMAL);
+  ssd1306_printFixed(56, 40, "Hz", STYLE_NORMAL);
 }
 
 void printMeasurementBlockSerial(struct measurement *m) {
