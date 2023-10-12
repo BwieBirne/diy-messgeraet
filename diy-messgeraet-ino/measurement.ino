@@ -85,7 +85,7 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
   }
 
   uint32_t periodduration = perioddurationSum / conf->FREQ_ITR;
-  float freq = (float)1 / periodduration;
+  float freq = ((float)1 / periodduration) / 1e6;
 
   return freq;
 }
