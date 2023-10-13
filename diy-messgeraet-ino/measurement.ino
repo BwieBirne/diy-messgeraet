@@ -71,6 +71,8 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
   min += cal->DAC_THRESHOLD / 2;
   max -= cal->DAC_THRESHOLD;
 
+  //printMinMaxAvgSerial(min, max, avg);
+
   uint32_t perioddurationSum = 0;
 
   for (int i = 0; i < conf->FREQ_ITR; i++) {
@@ -85,7 +87,7 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
   }
 
   uint32_t periodduration = perioddurationSum / conf->FREQ_ITR;
-  float freq = ((float)1 / periodduration) / 1e6;
+  float freq = ((float)1 / periodduration) / (float)1e6;
 
   return freq;
 }
@@ -106,6 +108,8 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
 
   sensorRead(mPin, &min, &max, &avg1, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
+  //printMinMaxAvgSerial(min, max, avg1);
+
   if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
 
   Serial.print("U auf ");
@@ -118,6 +122,8 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
   while (!digitalRead(conf->BTN1_PIN));
 
   sensorRead(mPin, &min, &max, &avg2, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
+
+  //printMinMaxAvgSerial(min, max, avg2);
 
   if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
 

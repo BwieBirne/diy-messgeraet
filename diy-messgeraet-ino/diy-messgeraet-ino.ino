@@ -45,7 +45,7 @@ typedef struct configuration {
 typedef struct calibration {
   float U_DIVIDER = 40.5f;
   float U_OFFSET = 0.0617f;
-  float I_RESISTANCE = 5.0f;  //Ohm - Messwiderstand muss noch ermittelt werden
+  float I_RESISTANCE = 4.9f;  //Ohm - Messwiderstand muss noch ermittelt werden
   uint8_t DAC_THRESHOLD = 20;
 };
 
@@ -90,7 +90,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 121023.2");
+  Serial.println("\nMessgerät - 131023.1");
 
   if (CONFIG_MODE) {
     //hier Konfiguration für Kalibrierung anpassen
