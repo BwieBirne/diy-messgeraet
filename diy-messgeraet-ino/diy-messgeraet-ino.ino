@@ -35,23 +35,24 @@ typedef struct configuration {
   const uint8_t BTN1_PIN = 2;
   const uint8_t BTN2_PIN = 4;
   const float CAL_POINTS[2] = { 1.0f, 5.0f };  //in V
-  const uint16_t MEASUREMENT_INTERVAL = 1000;  //milliseconds
+  const uint16_t MEASUREMENT_INTERVAL = 1000;  //in milliseconds
   const uint8_t MEASUREMENT_ITR = 2;
   const uint8_t FREQ_ITR = 2;
-  const uint16_t STD_PERIODDURATION = 20000;  //microseconds - 50Hz
+  const uint8_t MIN_FREQ = 25;                //in Hz
+  const uint16_t STD_PERIODDURATION = 20000;  //in microseconds - 50Hz
 };
 
 //calibration
 typedef struct calibration {
   float U_DIVIDER = 40.5f;
   float U_OFFSET = 0.0617f;
-  float I_RESISTANCE = 4.9f;  //Ohm - Messwiderstand muss noch ermittelt werden
+  float I_RESISTANCE = 4.9f;  //in Ohm - Messwiderstand muss noch ermittelt werden
   uint8_t DAC_THRESHOLD = 20;
 };
 
 //measurement
 typedef struct measurement {
-  uint32_t time = 0;                                   //milliseconds
+  uint32_t time = 0;                                   //in milliseconds
   float current_U[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in V
   float current_I[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in A
   float current_f[2] = { 0.0f, 0.0f };                 //in Hz - 0.0f is DC
@@ -60,7 +61,7 @@ typedef struct measurement {
 //constants
 #define SQRT2 1.4142
 
-//timer+
+//timer
 uint32_t m_timer = 0;
 
 enum measurement_type m_type = U;
@@ -72,7 +73,6 @@ struct calibration calI[PINS_COUNT];
 struct measurement msm;
 
 bool updateVisuals = false;
-
 
 void setup() {
 
@@ -90,7 +90,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 141023.1");
+  Serial.println("\nMessgerät - 141023.2");
 
   if (CONFIG_MODE) {
     //hier Konfiguration für Kalibrierung anpassen
@@ -102,6 +102,8 @@ void setup() {
       //EEPROM.put(EEPROM_CALI_ADDR, calI);
     }
   }
+
+  delay(500);
 
   Serial.println("Bereit.");
 
