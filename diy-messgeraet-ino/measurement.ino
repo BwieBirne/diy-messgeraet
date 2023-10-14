@@ -73,11 +73,11 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
   for (int i = 0; i < conf->FREQ_ITR; i++) {
     
     uint32_t timeOut = micros();
-    while ((analogRead(mPin) >= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
     while ((analogRead(mPin) <= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
+    while ((analogRead(mPin) >= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
     uint32_t start = micros();
-    while ((analogRead(mPin) >= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
     while ((analogRead(mPin) <= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
+    while ((analogRead(mPin) >= avg) && ((micros() - timeOut) < 2 * conf->STD_PERIODDURATION));
     uint32_t stop = micros();
     
     perioddurationSum += (stop - start);

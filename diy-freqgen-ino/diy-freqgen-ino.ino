@@ -1,7 +1,7 @@
 
 #define BAUD_RATE 115200
 #define PIN 2
-#define FREQ 100                 //in Hz
+#define FREQ 1000                 //in Hz
 #define MEASUREMENT_INTERVAL 100  //in milliseconds
 
 //timer
