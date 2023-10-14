@@ -1,8 +1,8 @@
 
 #define BAUD_RATE 115200
 #define PIN 2
-#define FREQ 1000                 //in Hz
-#define MEASUREMENT_INTERVAL 100  //in milliseconds
+#define FREQ 500                  //in Hz
+#define MEASUREMENT_INTERVAL 200  //in milliseconds
 
 //timer
 uint32_t m_timer = 0;
