@@ -90,7 +90,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 131023.1");
+  Serial.println("\nMessgerät - 141023.1");
 
   if (CONFIG_MODE) {
     //hier Konfiguration für Kalibrierung anpassen

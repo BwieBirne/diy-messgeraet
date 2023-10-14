@@ -13,7 +13,7 @@ void sensorRead(const uint8_t mPin, int16_t *min, int16_t *max, int16_t *avg, ui
     uint32_t newAvg = 0;
 
     uint32_t start = micros();
-    while (micros() - start < periodduration) {
+    while ((micros() - start) < periodduration) {
       uint16_t value = analogRead(mPin);
       if (value < newMin) newMin = value;
       if (value > newMax) newMax = value;
@@ -47,7 +47,7 @@ float getVoltage(const uint8_t mPin, struct configuration *conf, struct calibrat
 
   if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal->U_DIVIDER));
 
-  return (avg / cal->U_DIVIDER + cal->U_OFFSET);
+  return ((avg / cal->U_DIVIDER) + cal->U_OFFSET);
 }
 
 
@@ -66,7 +66,7 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
 
   sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if (max - min < 2 * cal->DAC_THRESHOLD) return (0.0f);
+  if ((max - min) < (2 * cal->DAC_THRESHOLD)) return (0.0f);
 
   min += cal->DAC_THRESHOLD / 2;
   max -= cal->DAC_THRESHOLD;
@@ -77,10 +77,11 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
 
   for (int i = 0; i < conf->FREQ_ITR; i++) {
     
-    while (analogRead(mPin) > min);
+    uint32_t timeOut = micros();
+    while ((analogRead(mPin) > min) && ((micros() - timeOut) < conf->STD_PERIODDURATION));
     uint32_t start = micros();
-
-    while (analogRead(mPin) < max);
+    timeOut = start;
+    while ((analogRead(mPin) < max) && ((micros() - timeOut) < conf->STD_PERIODDURATION));
     uint32_t stop = micros();
   
     perioddurationSum += 2 * (stop - start);
