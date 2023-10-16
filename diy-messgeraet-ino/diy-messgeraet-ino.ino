@@ -38,7 +38,7 @@ typedef struct configuration {
   const uint16_t MEASUREMENT_INTERVAL = 1000;  //in milliseconds
   const uint8_t MEASUREMENT_ITR = 2;
   const uint8_t FREQ_ITR = 2;
-  const uint8_t MIN_FREQ = 25;                //in Hz
+  const uint8_t MIN_FREQ = 50;                //in Hz
   const uint32_t STD_PERIODDURATION = 20000;  //in microseconds - 50Hz
 };
 

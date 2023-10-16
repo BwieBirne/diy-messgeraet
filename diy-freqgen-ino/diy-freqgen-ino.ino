@@ -47,7 +47,7 @@ void setup() {
   pinMode(PIN, OUTPUT);
   initArray();
 
-  Serial.println("\nFrequenzgenerator - 161023.1");
+  Serial.println("\nFrequenzgenerator - 161023.2");
 
   delay(500);
 
@@ -74,18 +74,21 @@ void loop() {
       sine();
       break;
     case 1:
-      rect();
+      sineDC();
       break;
     case 2:
-      rectDgt();
+      rect();
       break;
     case 3:
-      tri();
+      rectDgt();
       break;
     case 4:
-      ramp();
+      tri();
       break;
     case 5:
+      ramp();
+      break;
+    case 6:
       costum();
       break;
   }

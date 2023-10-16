@@ -10,6 +10,17 @@ void sine() {
   stop = micros();
 }
 
+void sineDC() {
+
+  start = micros();
+
+  while ((micros() - start) < periodduration) {
+    analogWrite(PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * M_PI) * maxValue)));
+  }
+
+  stop = micros();
+}
+
 void rect() {
 
   start = micros();
