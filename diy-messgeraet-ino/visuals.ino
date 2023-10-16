@@ -31,7 +31,7 @@ void printMeasurementBlockSerial(struct measurement *m) {
   Serial.print(m->time);
   Serial.println(" ms");
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print("U");
     Serial.print(i);
     Serial.print(": ");
@@ -39,7 +39,7 @@ void printMeasurementBlockSerial(struct measurement *m) {
     Serial.println(" V");
   }
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print("I");
     Serial.print(i);
     Serial.print(": ");
@@ -61,13 +61,13 @@ void printTabHeadSerial() {
 
   Serial.print("t(ms)\t");
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print("U");
     Serial.print(i);
     Serial.print("(V)\t");
   }
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print("I");
     Serial.print(i);
     Serial.print("(A)\t");
@@ -86,12 +86,12 @@ void printMeasurementTabSerial(struct measurement *m) {
   Serial.print(m->time);
   Serial.print("\t");
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print(m->current_U[i]);
     Serial.print("\t");
   }
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     Serial.print(m->current_I[i]);
     Serial.print("\t");
   }

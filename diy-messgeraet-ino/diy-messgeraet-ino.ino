@@ -14,8 +14,8 @@ enum measurement_type { U,
                         I };
 
 #define CONFIG_MODE false
-#define PINS_COUNT 3
 #define BAUD_RATE 115200
+#define PINS_COUNT 3
 
 //EEPROM
 #define EEPROM_CHECK_ADDR 0
@@ -39,7 +39,7 @@ typedef struct configuration {
   const uint8_t MEASUREMENT_ITR = 2;
   const uint8_t FREQ_ITR = 2;
   const uint8_t MIN_FREQ = 25;                //in Hz
-  const uint16_t STD_PERIODDURATION = 20000;  //in microseconds - 50Hz
+  const uint32_t STD_PERIODDURATION = 20000;  //in microseconds - 50Hz
 };
 
 //calibration
@@ -62,7 +62,7 @@ typedef struct measurement {
 #define SQRT2 1.4142
 
 //timer
-uint32_t m_timer = 0;
+uint32_t m_timer = 0;  //in milliseconds
 
 enum measurement_type m_type = U;
 enum frequency_type f_type = DC;
@@ -79,7 +79,7 @@ void setup() {
   Serial.begin(BAUD_RATE);
   Serial.setTimeout(1000);
 
-  for (int i = 0; i < PINS_COUNT; i++) {
+  for (uint8_t i = 0; i < PINS_COUNT; i++) {
     pinMode(config.U_PINS[i], INPUT);
     pinMode(config.I_PINS[i], INPUT);
   }
@@ -90,7 +90,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
-  Serial.println("\nMessgerät - 141023.2");
+  Serial.println("\nMessgerät - 161023.1");
 
   if (CONFIG_MODE) {
     //hier Konfiguration für Kalibrierung anpassen
@@ -100,6 +100,7 @@ void setup() {
       Serial.println("Kalibrierung erfolgreich!");
       //EEPROM.put(EEPROM_CALU_ADDR, calU);
       //EEPROM.put(EEPROM_CALI_ADDR, calI);
+      //while(1);
     }
   }
 
@@ -125,12 +126,12 @@ void timer() {
     msm.time = now;
     if (m_type == U) {
       msm.current_f[0] = getFreq(config.U_PINS[0], &config, &calU[0]);
-      for (int i = 0; i < PINS_COUNT; i++) {
+      for (uint8_t i = 0; i < PINS_COUNT; i++) {
         msm.current_U[i] = getVoltage(config.U_PINS[i], &config, &calU[i]);
       }
     } else {
       msm.current_f[1] = getFreq(config.I_PINS[0], &config, &calI[0]);
-      for (int i = 0; i < PINS_COUNT; i++) {
+      for (uint8_t i = 0; i < PINS_COUNT; i++) {
         msm.current_I[i] = getCurrent(config.I_PINS[i], &config, &calI[i]);
       }
     }
