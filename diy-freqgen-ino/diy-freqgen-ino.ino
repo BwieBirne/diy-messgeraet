@@ -26,7 +26,7 @@ uint32_t periodduration = 1e6 / freq;         //in microseconds
 uint32_t periodduration2 = (1e6 / freq) / 2;  //in microseconds
 uint16_t minValue = VDC * VOLTAGE_DIV;
 uint16_t maxValue = minValue + (Vpp * VOLTAGE_DIV);
-uint16_t timeCorrection = 15;  //in microseconds
+uint16_t timingCorrection = 15;  //in microseconds
 
 uint32_t start;  //in microseconds
 uint32_t stop;   //in microseconds
