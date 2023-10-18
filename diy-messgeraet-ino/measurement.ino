@@ -44,7 +44,7 @@ float getVoltage(const uint8_t mPin, struct configuration *conf, struct calibrat
 
   //printMinMaxAvgSerial(min, max, avg);
 
-  if (f_type != DC) return ((min + ((max - min) / (SQRT2))) / (cal->U_DIVIDER));
+  if (f_type != DC) return (((min + ((max - min) / (SQRT2))) / cal->U_DIVIDER) + cal->U_OFFSET);
 
   return ((avg / cal->U_DIVIDER) + cal->U_OFFSET);
 }
@@ -125,8 +125,8 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
   if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
 
   float uDiv = (avg2 - avg1) / (conf->CAL_POINTS[1] - conf->CAL_POINTS[0]);
-  float uOffset1 = conf->CAL_POINTS[0] - avg1 / uDiv;
-  float uOffset2 = conf->CAL_POINTS[1] - avg2 / uDiv;
+  float uOffset1 = conf->CAL_POINTS[0] - (avg1 / uDiv);
+  float uOffset2 = conf->CAL_POINTS[1] - (avg2 / uDiv);
   float uOffset = (uOffset1 + uOffset1) / 2;
 
   Serial.print("U_DIVIDER: ");

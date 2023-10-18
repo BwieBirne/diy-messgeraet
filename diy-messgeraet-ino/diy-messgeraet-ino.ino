@@ -47,7 +47,7 @@ typedef struct calibration {
   float U_DIVIDER = 40.0f;
   float U_OFFSET = 0.1f;
   float I_RESISTANCE = 5.0f;  //in Ohm - Messwiderstand muss noch ermittelt werden
-  uint8_t DAC_THRESHOLD = 20;
+  uint8_t DAC_THRESHOLD = 8;
 };
 
 //measurement
