@@ -44,9 +44,9 @@ typedef struct configuration {
 
 //calibration
 typedef struct calibration {
-  float U_DIVIDER = 40.5f;
-  float U_OFFSET = 0.0617f;
-  float I_RESISTANCE = 4.9f;  //in Ohm - Messwiderstand muss noch ermittelt werden
+  float U_DIVIDER = 40.0f;
+  float U_OFFSET = 0.1f;
+  float I_RESISTANCE = 5.0f;  //in Ohm - Messwiderstand muss noch ermittelt werden
   uint8_t DAC_THRESHOLD = 20;
 };
 
@@ -100,7 +100,7 @@ void setup() {
       Serial.println("Kalibrierung erfolgreich!");
       //EEPROM.put(EEPROM_CALU_ADDR, calU);
       //EEPROM.put(EEPROM_CALI_ADDR, calI);
-      //while(1);
+      while(1);
     }
   }
 

@@ -20,18 +20,13 @@ void serialEvent() {
       Serial.write((byte*)&calI, sizeof(calI));
       Serial.println();
 
-    } else if (statusInt == 110) {
+    } else if (statusInt == 111) {
 
       Serial.println(statusInt);
       Serial.write((byte*)&msm, sizeof(measurement));
       Serial.println();
 
-    } else if (statusInt == 111) {
-
-      Serial.println(statusInt);
-      //
-
-    } else if (statusInt == 120) {
+    } else if (statusInt == 121) {
 
       Serial.println(statusInt);
       Serial.readBytes((byte*)&config, sizeof(configuration));

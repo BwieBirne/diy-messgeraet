@@ -1,4 +1,10 @@
 
+void DC() {
+
+  analogWrite(PIN, minValue);
+  //delay(1000);
+}
+
 void sine() {
 
   start = micros();
@@ -66,6 +72,17 @@ void ramp() {
 
   while ((micros() - start) < periodduration) {
     analogWrite(PIN, (uint16_t)(minValue + (((micros() - start) / (float)periodduration) * maxValue)));
+  }
+
+  stop = micros();
+}
+
+void rando() {
+
+  start = micros();
+
+  while ((micros() - start) < periodduration) {
+    analogWrite(PIN, random(minValue, maxValue));
   }
 
   stop = micros();

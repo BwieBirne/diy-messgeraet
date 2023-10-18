@@ -16,23 +16,30 @@
 #define EEPROM_CHECK_VALUE 1
 #define EEPROM_ARRAY_ADDR 10
 
-uint8_t mode = 0;
-uint16_t freq = 50;  //in Hz
-float VDC = 0.0f;    //in V - max 5.0V
-float Vpp = 4.0f;    //in V - max 5.0V
-uint16_t mArray[ARRAY_LENGTH];
+typedef struct configuration {
+  uint8_t mode = 2;
+  uint16_t freq = 50;  //in Hz
+  float VDC = 0.0f;    //in V - max 5.0V
+  float Vpp = 4.0f;    //in V - max 5.0V
+  float V0 = 0.0f;     //in V - max 5.0V
+};
 
-uint32_t periodduration = 1e6 / freq;         //in microseconds
-uint32_t periodduration2 = (1e6 / freq) / 2;  //in microseconds
-uint16_t minValue = VDC * VOLTAGE_DIV;
-uint16_t maxValue = minValue + (Vpp * VOLTAGE_DIV);
-uint16_t timingCorrection = 15;  //in microseconds
+uint8_t waveMode;
+uint32_t periodduration;   //in microseconds
+uint32_t periodduration2;  //in microseconds
+uint16_t minValue;
+uint16_t maxValue;
+uint16_t V0Value;
 
 uint32_t start;  //in microseconds
 uint32_t stop;   //in microseconds
 
 //timer
 uint32_t m_timer = 0;  //in milliseconds
+
+struct configuration config;
+
+uint16_t mArray[ARRAY_LENGTH];
 
 void initArray() {
 
@@ -41,13 +48,24 @@ void initArray() {
   }
 }
 
+void update(struct configuration *conf) {
+
+  waveMode = conf->mode;
+  periodduration = 1e6 / conf->freq;
+  periodduration2 = (1e6 / conf->freq) / 2;
+  minValue = conf->VDC * VOLTAGE_DIV;
+  maxValue = minValue + (conf->Vpp * VOLTAGE_DIV);
+  V0Value = conf->V0 * VOLTAGE_DIV;
+}
+
 void setup() {
 
   Serial.begin(BAUD_RATE);
   pinMode(PIN, OUTPUT);
   initArray();
+  update(&config);
 
-  Serial.println("\nFrequenzgenerator - 161023.2");
+  Serial.println("\nFrequenzgenerator - 181023.1");
 
   delay(500);
 
@@ -60,7 +78,7 @@ void setup() {
     } else {
       Serial.println("Aufnahme erfolgreich!");
       //EEPROM.put(EEPROM_ARRAY_ADDR, mArray);
-      //while(1);
+      while(1);
     }
   }
 
@@ -69,26 +87,32 @@ void setup() {
 
 void loop() {
 
-  switch (mode) {
+  switch (waveMode) {
     case 0:
-      sine();
+      DC();
       break;
     case 1:
-      sineDC();
+      sine();
       break;
     case 2:
-      rect();
+      sineDC();
       break;
     case 3:
-      rectDgt();
+      rect();
       break;
     case 4:
-      tri();
+      rectDgt();
       break;
     case 5:
-      ramp();
+      tri();
       break;
     case 6:
+      ramp();
+      break;
+    case 7:
+      rando();
+      break;
+    case 8:
       costum();
       break;
   }
