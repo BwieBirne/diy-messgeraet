@@ -1,7 +1,7 @@
 
 void DC() {
 
-  analogWrite(PIN, minValue);
+  analogWrite(OUT_PIN, minValue);
   //delay(1000);
 }
 
@@ -10,7 +10,7 @@ void sine() {
   start = micros();
 
   while ((micros() - start) < periodduration) {
-    analogWrite(PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * 2 * M_PI) * maxValue)));
+    analogWrite(OUT_PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * 2 * M_PI) * maxValue)));
   }
 
   stop = micros();
@@ -21,7 +21,7 @@ void sineDC() {
   start = micros();
 
   while ((micros() - start) < periodduration) {
-    analogWrite(PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * M_PI) * maxValue)));
+    analogWrite(OUT_PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * M_PI) * maxValue)));
   }
 
   stop = micros();
@@ -31,9 +31,9 @@ void rect() {
 
   start = micros();
 
-  analogWrite(PIN, minValue);
+  analogWrite(OUT_PIN, minValue);
   delayMicroseconds(periodduration2);
-  analogWrite(PIN, maxValue);
+  analogWrite(OUT_PIN, maxValue);
   delayMicroseconds(periodduration2);
 
   stop = micros();
@@ -43,9 +43,9 @@ void rectDgt() {
 
   start = micros();
 
-  digitalWrite(PIN, LOW);
+  digitalWrite(OUT_PIN, LOW);
   delayMicroseconds(periodduration2);
-  digitalWrite(PIN, HIGH);
+  digitalWrite(OUT_PIN, HIGH);
   delayMicroseconds(periodduration2);
 
   stop = micros();
@@ -56,11 +56,11 @@ void tri() {
   start = micros();
 
   while ((micros() - start) < periodduration2) {
-    analogWrite(PIN, (int16_t)(minValue + (((micros() - start) / (float)periodduration2) * maxValue)));
+    analogWrite(OUT_PIN, (int16_t)(minValue + (((micros() - start) / (float)periodduration2) * maxValue)));
   }
   uint32_t start2 = micros();
   while ((micros() - start2) < periodduration2) {
-    analogWrite(PIN, (int16_t)(minValue + ((1 - ((micros() - start2) / (float)periodduration2)) * maxValue)));
+    analogWrite(OUT_PIN, (int16_t)(minValue + ((1 - ((micros() - start2) / (float)periodduration2)) * maxValue)));
   }
 
   stop = micros();
@@ -71,7 +71,7 @@ void ramp() {
   start = micros();
 
   while ((micros() - start) < periodduration) {
-    analogWrite(PIN, (uint16_t)(minValue + (((micros() - start) / (float)periodduration) * maxValue)));
+    analogWrite(OUT_PIN, (uint16_t)(minValue + (((micros() - start) / (float)periodduration) * maxValue)));
   }
 
   stop = micros();
@@ -82,7 +82,7 @@ void rando() {
   start = micros();
 
   while ((micros() - start) < periodduration) {
-    analogWrite(PIN, random(minValue, maxValue));
+    analogWrite(OUT_PIN, random(minValue, maxValue));
   }
 
   stop = micros();
@@ -94,7 +94,7 @@ void costum() {
 
   uint16_t i = 0;
   while ((mArray[i] != -1) && (i < ARRAY_LENGTH)) {
-    analogWrite(PIN, mArray[i]);
+    analogWrite(OUT_PIN, mArray[i]);
     i++;
   }
 
@@ -107,7 +107,7 @@ int8_t record() {
 
   uint16_t i = 0;
   while (((micros() - start) < periodduration) && (i < ARRAY_LENGTH)) {
-    mArray[i] = analogRead(PIN);
+    mArray[i] = analogRead(OUT_PIN);
     i++;
   }
 

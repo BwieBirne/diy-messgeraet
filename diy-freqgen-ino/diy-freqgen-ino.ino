@@ -6,10 +6,13 @@
 //constants
 #define RECORD_MODE false
 #define BAUD_RATE 115200
-#define PIN A0
 #define VOLTAGE_DIV 204.6f
 #define MEASUREMENT_INTERVAL 200  //in milliseconds
-#define ARRAY_LENGTH 4
+#define ARRAY_LENGTH 128
+
+//pins
+#define OUT_PIN A0
+#define GND_PIN A3
 
 //EEPROM
 #define EEPROM_CHECK_ADDR 0
@@ -29,7 +32,6 @@ uint32_t periodduration;   //in microseconds
 uint32_t periodduration2;  //in microseconds
 uint16_t minValue;
 uint16_t maxValue;
-uint16_t V0Value;
 
 uint32_t start;  //in microseconds
 uint32_t stop;   //in microseconds
@@ -55,17 +57,18 @@ void update(struct configuration *conf) {
   periodduration2 = (1e6 / conf->freq) / 2;
   minValue = conf->VDC * VOLTAGE_DIV;
   maxValue = minValue + (conf->Vpp * VOLTAGE_DIV);
-  V0Value = conf->V0 * VOLTAGE_DIV;
+  analogWrite(GND_PIN, conf->V0 * VOLTAGE_DIV);
 }
 
 void setup() {
 
   Serial.begin(BAUD_RATE);
-  pinMode(PIN, OUTPUT);
+  pinMode(OUT_PIN, OUTPUT);
+  pinMode(GND_PIN, OUTPUT);
   initArray();
   update(&config);
 
-  Serial.println("\nFrequenzgenerator - 181023.1");
+  Serial.println("\nFrequenzgenerator - 191023.1");
 
   delay(500);
 
