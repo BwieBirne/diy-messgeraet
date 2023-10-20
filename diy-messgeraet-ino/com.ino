@@ -38,3 +38,32 @@ void serialEvent() {
     }
   }
 }
+
+int8_t startAPandServer() {
+
+  Serial.println("Access Point starten...");
+  if (WiFi.status() == WL_NO_MODULE) {
+    Serial.println("Kommunikation mit WiFi-Modul fehlgeschlagen!");
+    return -1;
+  }
+
+  String fwv = WiFi.firmwareVersion();
+  if (fwv < WIFI_FIRMWARE_LATEST_VERSION) {
+    Serial.println("WiFi-Modul Firmware kann aktualisiert werden!");
+  }
+
+  // by default the local IP address will be 192.168.4.1
+  // you can override it with the following:
+  // WiFi.config(IPAddress(10, 0, 0, 1));
+
+  WiFiStatus = WiFi.beginAP(NETWORK_SSID, NETWORK_PASS);
+  if (WiFiStatus != WL_AP_LISTENING) {
+    Serial.println("Access Point konnte nicht gestartet werden!");
+    return -1;
+  }
+
+  Serial.println("Server starten...");
+  server.begin();
+
+  return 0;
+}

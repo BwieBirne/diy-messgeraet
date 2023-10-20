@@ -44,7 +44,7 @@ float getVoltage(const uint8_t mPin, struct configuration *conf, struct calibrat
 
   //printMinMaxAvgSerial(min, max, avg);
 
-  if (f_type != DC) return (((min + ((max - min) / (SQRT2))) / cal->U_DIVIDER) + cal->U_OFFSET);
+  if (!DC) return (((min + ((max - min) / (SQRT2))) / cal->U_DIVIDER) + cal->U_OFFSET);
 
   return ((avg / cal->U_DIVIDER) + cal->U_OFFSET);
 }
@@ -64,7 +64,7 @@ float getFreq(const uint8_t mPin, struct configuration *conf, struct calibration
 
   sensorRead(mPin, &min, &max, &avg, conf->STD_PERIODDURATION, conf->MEASUREMENT_ITR);
 
-  if ((max - min) < (2 * cal->DAC_THRESHOLD)) return (0.0f);
+  if ((max - min) < (2 * conf->DAC_THRESHOLD)) return (0.0f);
 
   //printMinMaxAvgSerial(min, max, avg);
 
@@ -107,7 +107,7 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
 
   //printMinMaxAvgSerial(min, max, avg1);
 
-  if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
+  if (max - min > 2 * conf->DAC_THRESHOLD) return 1;
 
   Serial.print("U auf ");
   Serial.print(conf->CAL_POINTS[1]);
@@ -122,7 +122,7 @@ int8_t senCal(const uint8_t mPin, struct configuration *conf, struct calibration
 
   //printMinMaxAvgSerial(min, max, avg2);
 
-  if (max - min > 2 * cal->DAC_THRESHOLD) return 1;
+  if (max - min > 2 * conf->DAC_THRESHOLD) return 1;
 
   float uDiv = (avg2 - avg1) / (conf->CAL_POINTS[1] - conf->CAL_POINTS[0]);
   float uOffset1 = conf->CAL_POINTS[0] - (avg1 / uDiv);

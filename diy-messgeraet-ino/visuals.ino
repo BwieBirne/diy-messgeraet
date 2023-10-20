@@ -5,9 +5,9 @@ void printMeasurementDisplay(struct measurement *m) {
   //ohne clear sieht schöner aus, aber vielleicht brauchen wir es, wenn es Anzeigebugs gibt
   //ssd1306_clearScreen();
 
-  const char U_char[DISPLAY_CHAR_LENGTH];
-  const char I_char[DISPLAY_CHAR_LENGTH];
-  const char f_char[DISPLAY_CHAR_LENGTH];
+  char U_char[DISPLAY_CHAR_LENGTH];
+  char I_char[DISPLAY_CHAR_LENGTH];
+  char f_char[DISPLAY_CHAR_LENGTH];
 
   dtostrf(m->current_U[0], 6, 2, U_char);
   dtostrf(m->current_I[0], 6, 2, I_char);
@@ -102,6 +102,20 @@ void printMeasurementTabSerial(struct measurement *m) {
   Serial.print("\t");
 
   Serial.println();
+}
+
+void printWiFiStatus() {
+
+  Serial.print("SSID: ");
+  //Serial.println(NETWORK_SSID);
+  Serial.println(WiFi.SSID());
+  Serial.print("PASS: "); 
+  Serial.println(NETWORK_PASS);
+
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
 }
 
 void printMinMaxAvgSerial(int min, int max, int avg) {
