@@ -1,6 +1,6 @@
 
 //includes
-#include <avr/dtostrf.h> //only Nano
+#include <avr/dtostrf.h>
 #include "ssd1306.h"     //Alexey Dynda
 //#include <EEPROM.h>
 #include <WiFiNINA.h>
@@ -9,10 +9,13 @@
 #define CONFIG_MODE false
 #define BAUD_RATE 115200
 #define PINS_COUNT 3
+#define INPUT_VOLTAGE 3.3f //in V
+#define ADC_RESOLUTION 1023
+#define VOLTAGE_DIV (float)(ADC_RESOLUTION / INPUT_VOLTAGE)
 
-//WIFI
-#define NETWORK_SSID "SSID"
-#define NETWORK_PASS "1234"
+//WIFI - min 8 digits
+#define NETWORK_SSID "SSIDSSID"
+#define NETWORK_PASS "12345678"
 #define MAX_BUFFER 10
 
 //EEPROM
@@ -30,8 +33,8 @@ bool btn2Lock = false;
 typedef struct configuration {
   const uint8_t U_PINS[PINS_COUNT] = { A0, A0, A0 };
   const uint8_t I_PINS[PINS_COUNT] = { A3, A3, A3 };
-  const uint8_t BTN1_PIN = 2;
-  const uint8_t BTN2_PIN = 4;
+  const uint8_t BTN1_PIN = 4;
+  const uint8_t BTN2_PIN = 7;
   const float CAL_POINTS[2] = { 1.0f, 5.0f };  //in V
   const uint16_t MEASUREMENT_INTERVAL = 1000;  //in milliseconds
   const uint8_t MEASUREMENT_ITR = 2;
@@ -43,8 +46,8 @@ typedef struct configuration {
 
 //calibration
 typedef struct calibration {
-  float U_DIVIDER = 40.0f;
-  float U_OFFSET = 0.1f;
+  float U_DIVIDER = 60.75f;
+  float U_OFFSET = -0.037f;
   float I_RESISTANCE = 5.0f;  //in Ohm - Messwiderstand muss noch ermittelt werden
 };
 
@@ -97,6 +100,7 @@ void setup() {
   ssd1306_clearScreen();
 
   //getData();
+  while (!Serial);
   Serial.println("\nMessgerät - 191023.1");
 
   if (CONFIG_MODE) {
@@ -111,14 +115,14 @@ void setup() {
     }
   }
 
-  delay(500);
-
   if (startAPandServer()) {
     Serial.println("Access Point und Server konnten nicht gestartet werden!");
   } else {
     Serial.println("Access Point und Server gestartet!");
     printWiFiStatus();
   }
+  
+  delay(500);
 
   Serial.println("Bereit.");
 
@@ -127,7 +131,7 @@ void setup() {
 
 void loop() {
 
-  webserver();
+  //webserver();
   timer();
   controls();
 }

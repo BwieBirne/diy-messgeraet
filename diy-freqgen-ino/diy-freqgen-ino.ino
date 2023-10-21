@@ -6,7 +6,9 @@
 //constants
 #define RECORD_MODE false
 #define BAUD_RATE 115200
-#define VOLTAGE_DIV 204.6f
+#define OUTPUT_VOLTAGE 5.0f //in V
+#define ADC_RESOLUTION 1023
+#define VOLTAGE_DIV (float)(ADC_RESOLUTION / OUTPUT_VOLTAGE)
 #define MEASUREMENT_INTERVAL 200  //in milliseconds
 #define ARRAY_LENGTH 128
 
@@ -67,6 +69,7 @@ void setup() {
   pinMode(GND_PIN, OUTPUT);
   initArray();
   update(&config);
+  while (!Serial);
 
   Serial.println("\nFrequenzgenerator - 191023.1");
 
