@@ -1,7 +1,7 @@
 //Nano 33 IoT
 //includes
 #include <avr/dtostrf.h>
-#include "ssd1306.h"     //Alexey Dynda
+#include "ssd1306.h"  //Alexey Dynda
 //#include <EEPROM.h>
 #include <WiFiNINA.h>
 //#include <ArduinoBLE.h>
@@ -9,9 +9,10 @@
 #define CONFIG_MODE false
 #define BAUD_RATE 115200
 #define PINS_COUNT 3
-#define INPUT_VOLTAGE 3.3f //in V
+#define INPUT_VOLTAGE 3.3f  //in V
 #define ADC_RESOLUTION 1023
 #define VOLTAGE_DIV (float)(ADC_RESOLUTION / INPUT_VOLTAGE)
+#define FAST_AR_MODE true
 
 //WIFI - min 8 digits
 #define NETWORK_SSID "SSIDSSID"
@@ -53,12 +54,12 @@ typedef struct calibration {
 
 //measurement
 typedef struct measurement {
-  uint32_t time = 0;                                   //in milliseconds
+  uint32_t time = 0;  //in milliseconds
   bool voltage = true;
   float current_U[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in V
   float current_I[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in A
   float current_f[2] = { 0.0f, 0.0f };                 //in Hz - 0.0f is DC
- };
+};
 
 typedef struct measurementReduced {
   uint32_t time = 0;  //in milliseconds
@@ -90,6 +91,16 @@ void setup() {
   Serial.begin(BAUD_RATE);
   Serial.setTimeout(1000);
 
+  if (FAST_AR_MODE) {
+
+    while (ADC->STATUS.bit.SYNCBUSY == 1);
+
+    ADC->CTRLB.reg &= 0b1111100011111111;                                     // mask PRESCALER bits
+    ADC->CTRLB.reg |= ADC_CTRLB_PRESCALER_DIV64;                              // divide Clock by 64
+    ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 | ADC_AVGCTRL_ADJRES(0x00ul);  // adjusting result by 0
+    ADC->SAMPCTRL.reg = 0x00;                                                 // sampling Time Length = 0
+  }
+
   for (uint8_t i = 0; i < PINS_COUNT; i++) {
     pinMode(config.U_PINS[i], INPUT);
     pinMode(config.I_PINS[i], INPUT);
@@ -112,7 +123,7 @@ void setup() {
       Serial.println("Kalibrierung erfolgreich!");
       //EEPROM.put(EEPROM_CALU_ADDR, calU);
       //EEPROM.put(EEPROM_CALI_ADDR, calI);
-      while(1);
+      while (1);
     }
   }
 
@@ -122,7 +133,7 @@ void setup() {
     Serial.println("Access Point und Server gestartet!");
     printWiFiStatus();
   }
-  
+
   delay(500);
 
   Serial.println("Bereit.");
@@ -193,9 +204,29 @@ void controls() {
 
 uint16_t fastAnalogRead(const uint8_t mPin) {
 
-  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV64 | ADC_CTRLB_RESSEL_12BIT;
+  ADC->CTRLA.bit.ENABLE = 0;
 
-  return 0;
+  while (ADC->STATUS.bit.SYNCBUSY == 1);
+
+  int CTRLBoriginal = ADC->CTRLB.reg;
+  int AVGCTRLoriginal = ADC->AVGCTRL.reg;
+  int SAMPCTRLoriginal = ADC->SAMPCTRL.reg;
+
+  ADC->CTRLB.reg &= 0b1111100011111111;
+  ADC->CTRLB.reg |= ADC_CTRLB_PRESCALER_DIV64;
+  ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 | ADC_AVGCTRL_ADJRES(0x00ul);
+  ADC->SAMPCTRL.reg = 0x00;
+
+  ADC->CTRLA.bit.ENABLE = 1;
+  while (ADC->STATUS.bit.SYNCBUSY == 1);
+
+  int adc = analogRead(mPin);
+
+  ADC->CTRLB.reg = CTRLBoriginal;
+  ADC->AVGCTRL.reg = AVGCTRLoriginal;
+  ADC->SAMPCTRL.reg = SAMPCTRLoriginal;
+
+  return adc;
 }
 
 /*
