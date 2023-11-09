@@ -13,13 +13,16 @@ void sensorRead(const uint8_t mPin, int16_t *min, int16_t *max, int16_t *avg, ui
     uint32_t newAvg = 0;
 
     uint32_t start = micros();
+    int j = 0;
     while ((micros() - start) < periodduration) {
       uint16_t value = analogRead(mPin);
       if (value < newMin) newMin = value;
       if (value > newMax) newMax = value;
       newAvg += value;
       count++;
+      j++;
     }
+    Serial.println(j);
     newAvg /= count;
 
     minSum += newMin;

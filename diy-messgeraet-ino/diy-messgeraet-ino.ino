@@ -1,4 +1,4 @@
-
+//Nano 33 IoT
 //includes
 #include <avr/dtostrf.h>
 #include "ssd1306.h"     //Alexey Dynda
@@ -54,6 +54,7 @@ typedef struct calibration {
 //measurement
 typedef struct measurement {
   uint32_t time = 0;                                   //in milliseconds
+  bool voltage = true;
   float current_U[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in V
   float current_I[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in A
   float current_f[2] = { 0.0f, 0.0f };                 //in Hz - 0.0f is DC
@@ -63,7 +64,7 @@ typedef struct measurementReduced {
   uint32_t time = 0;  //in milliseconds
   bool voltage = true;
   float values[PINS_COUNT] = { 0.0f, 0.0f, 0.0f };  //in V or A
-  float f = 0.0f;                                   //in Hz - 0.0f is DC
+  //float f = 0.0f;                                   //in Hz - 0.0f is DC
 };
 
 //constants
@@ -133,7 +134,7 @@ void loop() {
 
   //webserver();
   timer();
-  controls();
+  //controls();
 }
 
 void timer() {
@@ -144,11 +145,13 @@ void timer() {
     m_timer = now;
     msm.time = now;
     if (measureU) {
+      msm.voltage = true;
       msm.current_f[0] = getFreq(config.U_PINS[0], &config, &calU[0]);
       for (uint8_t i = 0; i < PINS_COUNT; i++) {
         msm.current_U[i] = getVoltage(config.U_PINS[i], &config, &calU[i]);
       }
     } else {
+      msm.voltage = false;
       msm.current_f[1] = getFreq(config.I_PINS[0], &config, &calI[0]);
       for (uint8_t i = 0; i < PINS_COUNT; i++) {
         msm.current_I[i] = getCurrent(config.I_PINS[i], &config, &calI[i]);
@@ -186,6 +189,13 @@ void controls() {
     updateVisuals = true;
     return;
   }
+}
+
+uint16_t fastAnalogRead(const uint8_t mPin) {
+
+  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV64 | ADC_CTRLB_RESSEL_12BIT;
+
+  return 0;
 }
 
 /*
