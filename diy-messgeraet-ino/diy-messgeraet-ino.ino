@@ -10,6 +10,7 @@
 #define BAUD_RATE 115200
 #define PINS_COUNT 3
 #define INPUT_VOLTAGE 3.3f  //in V
+#define AR_RESOLUTION 10
 #define ADC_RESOLUTION 1023
 #define VOLTAGE_DIV (float)(ADC_RESOLUTION / INPUT_VOLTAGE)
 #define FAST_AR_MODE true
@@ -113,7 +114,7 @@ void setup() {
 
   //getData();
   while (!Serial);
-  Serial.println("\nMessgerät - 191023.1");
+  Serial.println("\nMessgerät - 131123.1");
 
   if (CONFIG_MODE) {
     //hier Konfiguration für Kalibrierung anpassen
@@ -220,7 +221,7 @@ uint16_t fastAnalogRead(const uint8_t mPin) {
   ADC->CTRLA.bit.ENABLE = 1;
   while (ADC->STATUS.bit.SYNCBUSY == 1);
 
-  int adc = analogRead(mPin);
+  uint16_t adc = analogRead(mPin);
 
   ADC->CTRLB.reg = CTRLBoriginal;
   ADC->AVGCTRL.reg = AVGCTRLoriginal;
