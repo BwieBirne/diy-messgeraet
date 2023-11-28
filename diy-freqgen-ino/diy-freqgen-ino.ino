@@ -1,4 +1,4 @@
-
+//TODO: Alle analogRead() durch PWM-Timing ersetzen
 //includes
 #include "math.h"
 #include <EEPROM.h>
@@ -22,10 +22,10 @@
 #define EEPROM_ARRAY_ADDR 10
 
 typedef struct configuration {
-  uint8_t mode = 2;
+  uint8_t mode = 1;
   uint16_t freq = 50;  //in Hz
   float VDC = 0.0f;    //in V - max 5.0V
-  float Vpp = 4.0f;    //in V - max 5.0V
+  float Vpp = 5.0f;    //in V - max 5.0V
   float V0 = 0.0f;     //in V - max 5.0V
 };
 

@@ -12,7 +12,7 @@ void sine() {
   while ((micros() - start) < periodduration) {
     analogWrite(OUT_PIN, (int16_t)(minValue + (sin((((micros() - start) / (float)periodduration)) * 2 * M_PI) * maxValue)));
   }
-
+  
   stop = micros();
 }
 
